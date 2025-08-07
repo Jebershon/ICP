@@ -1,4 +1,4 @@
-async function awardCompensation(page, body, res,
+async function awardCompensation(page,browser,body, res,
         INDCommunicationAllowance,
         INDOvertimeRequest,
         KSABusinessTripRequest,
@@ -8,8 +8,7 @@ async function awardCompensation(page, body, res,
         UAEBusinessTripRequest,
         UAECommunicationAllowance,
         UAEOvertimeRequest,
-        UAESchoolSupportProgram,
-        browser) {
+        UAESchoolSupportProgram) {
 
     // Destructure required fields from req.body
     const { plan } = body;
@@ -39,13 +38,13 @@ async function awardCompensation(page, body, res,
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:CreatePopup\\:\\:popup-container', { visible: true });
 
     //Call function based on plan name
-    if (plan === 'IND Communication Allowance') {
+    if (plan === 'IND Communication Allowance') { //Completed
         await INDCommunicationAllowance(browser, page, body, res);
     }
-    else if (plan === 'IND Overtime Request') {
+    else if (plan === 'IND Overtime Request') { //Completed
         await INDOvertimeRequest(browser, page, body, res);
     }
-    else if (plan === 'KSA Business Trip Request') {
+    else if (plan === 'KSA Business Trip Request') { //in progress
         await KSABusinessTripRequest(browser, page, body, res);
     }
     else if (plan === 'KSA Communication allowance') { //Completed 

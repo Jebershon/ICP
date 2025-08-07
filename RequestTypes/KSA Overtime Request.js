@@ -1,6 +1,6 @@
 async function KSAOvertimeRequest(browser, page, body, res) {
     // Destructure required fields from req.body
-    const { plan, option, ToDate, Fromdate, RequestedOvertimeRegular, RequestedOvertimeWeekend, RequestedOvertimePublicHolidays, Comments, Information, SystemCalculatedRegularOvertime, SystemCalculatedWeekendOvertime, SystemCalculatedPublicHolidayOvertime } = body;
+    const { plan, option, ToDate, Fromdate, RequestedOvertimeRegular, RequestedOvertimeWeekend, RequestedOvertimePublicHolidays, Comments, Information} = body;
 
     // Validate required fields
     if (
@@ -78,30 +78,30 @@ async function KSAOvertimeRequest(browser, page, body, res) {
 
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
 
-    if(SystemCalculatedRegularOvertime !== undefined && SystemCalculatedRegularOvertime !== null && SystemCalculatedRegularOvertime !== '') {
-    // System Calculated Regular Overtime	
-    const inputSelector1 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:4\\:screenEntryValue\\:\\:content"]';
-    await page.waitForSelector(inputSelector1, { visible: true });
-    await page.click(inputSelector1, { clickCount: 3 }); // Optional: Select all to replace existing value
-    await page.type(inputSelector1, SystemCalculatedRegularOvertime+'');
-    }
+    // if(SystemCalculatedRegularOvertime !== undefined && SystemCalculatedRegularOvertime !== null && SystemCalculatedRegularOvertime !== '') {
+    // // System Calculated Regular Overtime	
+    // const inputSelector1 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:4\\:screenEntryValue\\:\\:content"]';
+    // await page.waitForSelector(inputSelector1, { visible: true });
+    // await page.click(inputSelector1, { clickCount: 3 }); // Optional: Select all to replace existing value
+    // await page.type(inputSelector1, SystemCalculatedRegularOvertime+'');
+    // }
 
-    if(SystemCalculatedWeekendOvertime !== undefined && SystemCalculatedWeekendOvertime !== null && SystemCalculatedWeekendOvertime !== '') {
-    // System Calculated Weekend Overtime
-    const inputSelector2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:5\\:screenEntryValue\\:\\:content"]';
-    await page.waitForSelector(inputSelector2, { visible: true });
-    await page.click(inputSelector2, { clickCount: 3 }); // Optional: select existing text
-    await page.type(inputSelector2, SystemCalculatedWeekendOvertime+'');
-    }
+    // if(SystemCalculatedWeekendOvertime !== undefined && SystemCalculatedWeekendOvertime !== null && SystemCalculatedWeekendOvertime !== '') {
+    // // System Calculated Weekend Overtime
+    // const inputSelector2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:5\\:screenEntryValue\\:\\:content"]';
+    // await page.waitForSelector(inputSelector2, { visible: true });
+    // await page.click(inputSelector2, { clickCount: 3 }); // Optional: select existing text
+    // await page.type(inputSelector2, SystemCalculatedWeekendOvertime+'');
+    // }
 
-    if(SystemCalculatedPublicHolidayOvertime !== undefined && SystemCalculatedPublicHolidayOvertime !== null && SystemCalculatedPublicHolidayOvertime !== '') {
-    // System Calculated Public Holiday Overtime
-    const inputSelector3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:6\\:screenEntryValue\\:\\:content"]';
-    await page.waitForSelector(inputSelector3, { visible: true });
-    await page.click(inputSelector3, { clickCount: 3 }); // Optional: Select all to replace existing value
-    await page.type(inputSelector3, SystemCalculatedPublicHolidayOvertime+'');
-    await page.keyboard.press('Tab');
-    }
+    // if(SystemCalculatedPublicHolidayOvertime !== undefined && SystemCalculatedPublicHolidayOvertime !== null && SystemCalculatedPublicHolidayOvertime !== '') {
+    // // System Calculated Public Holiday Overtime
+    // const inputSelector3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:6\\:screenEntryValue\\:\\:content"]';
+    // await page.waitForSelector(inputSelector3, { visible: true });
+    // await page.click(inputSelector3, { clickCount: 3 }); // Optional: Select all to replace existing value
+    // await page.type(inputSelector3, SystemCalculatedPublicHolidayOvertime+'');
+    // await page.keyboard.press('Tab');
+    // }
 
     // Requested Overtime Regular
     const inputSelector4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:7\\:screenEntryValueNumber\\:\\:content"]';
@@ -135,6 +135,18 @@ async function KSAOvertimeRequest(browser, page, body, res) {
     await page.waitForSelector(inputSelector8, { visible: true });
     await page.click(inputSelector8, { clickCount: 3 }); // Optional: select existing value
     await page.type(inputSelector8, Information+'');
+    await page.keyboard.press('Tab');
+
+    //Wait for error popup
+    try{
+        await page.waitForSelector('#DhtmlZOrderManagerLayerContainer #_FOd1\\:\\:popup-container', { visible: true, timeout: 3000 });
+        errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span',(el) => el.textContent.trim());
+        await page.click('#_FOd1\\:\\:msgDlg\\:\\:cancel');
+        browser.close();
+        return res.status(200).json({ message: errorMessage });
+    } catch (error) {
+        console.log('No error message displayed, proceeding with the request.');
+    }
 }
 
 module.exports = KSAOvertimeRequest;
