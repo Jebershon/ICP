@@ -15,7 +15,7 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
 
         if (!personNumber) {
             await browser.close();
-            return res.status(400).json({ error: 'Person Number is Missing!' });
+            return res.status(500).json({ error: 'Person Number is Missing!' });
         }
 
         //Login to Oracle Fusion
@@ -43,13 +43,13 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
         );
 
         //Delay
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
 
         //Continue
         await page.waitForFunction(() => {
             const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
             return buttons.some(btn => btn.innerText.replace(/\s+/g, '').includes('Continue'));
-        }, { timeout: 30000 });
+        }, { timeout: 4000 });
 
         await page.evaluate(() => {
             const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
@@ -61,13 +61,12 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
                 }
             }
         });
-         await new Promise(resolve => setTimeout(resolve, 3000));
 
         //submit
         await page.waitForFunction(() => {
             const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
             return buttons.some(btn => btn.innerText.replace(/\s+/g, '').includes('Submit'));
-        }, { timeout: 3000 });
+        }, { timeout: 4000 });
         await page.evaluate(() => {
             const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
             for (let btn of buttons) {
@@ -78,10 +77,10 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
                 }
             }
         });
-        await new Promise(resolve => setTimeout(resolve, 3000));
 
         // Wait for the warning
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okWarningDialog', { timeout: 30000 });
+        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okWarningDialog', 
+        { timeout: 4000 });
         await page.evaluate(() => {
             const btn = document.querySelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okWarningDialog');
             if (btn) {
@@ -89,12 +88,16 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
                 btn.click();
             }
         });
-        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 4000)));
         
         //final ok button
         await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okConfirmationDialog');
         await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okConfirmationDialog');
 
+        
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+        
         // Close the browser
         await browser.close();
 }

@@ -81,12 +81,14 @@ async function awardCompensation(page,browser,body, res,
         return res.status(400).json({ error: 'Invalid plan name' });
     }
 
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+
    // Submit request button
     const submitButtonSelector = '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:d2\\:\\:ok';
     await page.waitForSelector(submitButtonSelector, { visible: true });
     await page.click(submitButtonSelector, { delay: 1000 });
 
-    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
 
     // Wait for the confirmation message
     try{

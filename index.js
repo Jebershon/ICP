@@ -54,7 +54,7 @@ app.post('/automate-login', async (req, res) => {
     } catch (error) {
         // Handle any errors that occur during the automation
         console.error('Automation Error:', error);
-        if(error.message.includes('Node is detached from document')) {
+        if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')) {
             const url = process.env.URL;
             const username = process.env.GCPUSERNAME;
             const password = process.env.GCPPASSWORD;
