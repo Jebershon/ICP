@@ -34,8 +34,16 @@ async function awardCompensation(page,browser,body, res,
         return res.status(400).json({ error: 'Warning - Individual Compensation: ' + messages.join(', ') });
     }
 
+    try{
     // Wait for Modal
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:CreatePopup\\:\\:popup-container', { visible: true });
+    }
+    catch(error){
+    // Clicking the Award Compensation Button
+    console.log('No modal found, clicking the button again.');
+    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:commandToolbarButton1', { visible: true });
+    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:commandToolbarButton1 a');
+    }
 
     //Call function based on plan name
     if (plan === 'IND Communication Allowance') { //Completed

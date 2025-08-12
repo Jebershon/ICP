@@ -1,10 +1,10 @@
 async function INDOvertimeRequest(browser, page, body, res) {
     // Destructure required fields from req.body
-    const { plan, option, ToDate, Fromdate, RequestedOvertimeRegular, RequestedOvertimeWeekend, RequestedOvertimePublicHolidays, Comments, Information} = body;
+    const { plan, option, ToDate, Fromdate, RequestedOvertimeRegular, RequestedOvertimeWeekend, RequestedOvertimePublicHolidays, Comments} = body;
 
     // Validate required fields
     if (
-        !plan || !option || !ToDate || !Fromdate || !Comments || !RequestedOvertimeRegular
+        !plan || !option || !ToDate || !Fromdate || !Comments || !RequestedOvertimeRegular || !RequestedOvertimeWeekend || !RequestedOvertimePublicHolidays
     ) {
         await browser.close();
         // Find which fields are missing
@@ -15,17 +15,15 @@ async function INDOvertimeRequest(browser, page, body, res) {
         if (!Fromdate) missingFields.push('Fromdate');
         if (!Comments) missingFields.push('Comments');
         if (!RequestedOvertimeRegular) missingFields.push('RequestedOvertimeRegular');
+        if (!RequestedOvertimeWeekend) missingFields.push('RequestedOvertimeWeekend');
+        if (!RequestedOvertimePublicHolidays) missingFields.push('RequestedOvertimePublicHolidays');
         return res.status(400).json({ error: 'Missing required fields', missingFields });
     }
     
     //Begin form
     // Open Plans Dropdown
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:drop');
-
-    // Wait for List
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:pop', { visible: true });
-
-    // Set plan
     await page.evaluate((plan) => {
         const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:pop li');
         for (let item of items) {
@@ -42,11 +40,7 @@ async function INDOvertimeRequest(browser, page, body, res) {
 
     // Open Options Dropdown
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
-
-    // Wait for List
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
-
-    // Set Option
     await page.evaluate((option) => {
         const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop li');
         for (let item of items) {
@@ -75,7 +69,6 @@ async function INDOvertimeRequest(browser, page, body, res) {
     await page.keyboard.press('Backspace');
     await page.type(toDateSelector, ToDate); // Replace `ToDate` with your actual variable or string like "08/31/25"
     await page.keyboard.press('Tab');
-
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
 
     // Requested Overtime Regular

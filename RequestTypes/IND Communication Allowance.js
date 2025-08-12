@@ -14,11 +14,7 @@ async function INDCommunicationAllowance(browser, page, body, res) {
 
     // Open Plans Dropdown
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:drop');
-
-    // Wait for List
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:pop', { visible: true });
-
-    // Set plan
     await page.evaluate((plan) => {
         const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:pop li');
         for (let item of items) {
@@ -35,11 +31,7 @@ async function INDCommunicationAllowance(browser, page, body, res) {
 
     // Open Options Dropdown
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
-
-    // Wait for List
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
-
-    // Set Option
     await page.evaluate((option) => {
         const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop li');
         for (let item of items) {
@@ -52,20 +44,16 @@ async function INDCommunicationAllowance(browser, page, body, res) {
     }, option);
 
     // Delay for option selection
-    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 4000)));
 
-    // Open the LOV input field to trigger the dropdown
+    try{
+    //Payment Type
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:16\\:lovScreenEntryValue\\:\\:content');
-
-    // Wait for the dropdown <ul> to become visible
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:16\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-
-    // Select the correct option by text (pass your desired value to `PaymentType`)
     await page.evaluate((PaymentType) => {
         const options = document.querySelectorAll(
             '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:16\\:lovScreenEntryValue\\:\\:pop li'
         );
-
         for (const option of options) {
             if (option.innerText.trim() === PaymentType) {
                 option.scrollIntoView();
@@ -74,7 +62,37 @@ async function INDCommunicationAllowance(browser, page, body, res) {
             }
         }
     }, PaymentType);
+    }catch(error){
+        if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')){
+            console.error('Retry selecting Payment Type:', error);
+            //Payment Type
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:16\\:lovScreenEntryValue\\:\\:content');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:16\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+            await page.evaluate((PaymentType) => {
+                const options = document.querySelectorAll(
+                    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:16\\:lovScreenEntryValue\\:\\:pop li'
+                );
+                for (const option of options) {
+                    if (option.innerText.trim() === PaymentType) {
+                        option.scrollIntoView();
+                        option.click();
+                        break;
+                    }
+                }
+            }, PaymentType);
+    }
+    }
 
+    //Wait for error popup
+    try{
+        await page.waitForSelector('#DhtmlZOrderManagerLayerContainer #_FOd1\\:\\:popup-container', { visible: true, timeout: 3000 });
+        errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span',(el) => el.textContent.trim());
+        await page.click('#_FOd1\\:\\:msgDlg\\:\\:cancel');
+        browser.close();
+        return res.status(200).json({ message: errorMessage });
+    } catch (error) {
+        console.log('No error message displayed, proceeding with the request.');
+    }
 }
 
 module.exports = INDCommunicationAllowance;

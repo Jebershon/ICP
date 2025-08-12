@@ -30,7 +30,7 @@ app.post('/automate-login', async (req, res) => {
     const url = process.env.URL;
     const username = process.env.GCPUSERNAME;
     const password = process.env.GCPPASSWORD;
-
+    try {
     // Continue with your Puppeteer automation using the extracted values
     try {
         const browser = await puppeteer.launch({ headless: false }); // Set true if you don't want UI
@@ -60,6 +60,8 @@ app.post('/automate-login', async (req, res) => {
             const password = process.env.GCPPASSWORD;
             const browser = await puppeteer.launch({ headless: false }); // Set true if you don't want UI
             const page = await browser.newPage();
+            await page.reload({ waitUntil: 'networkidle2' });
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 10000)));
             await Scenario(res,req.body,page, browser, username, password,url,
             Login, 
             PersonManagement, 
@@ -76,6 +78,11 @@ app.post('/automate-login', async (req, res) => {
             UAESchoolSupportProgram,
         );
         }
+        res.status(500).json({ success: false, message: 'Automation failed', error: error.message });
+    }
+    }
+    catch(error){
+        console.error('Error occurred during automation:', error);
         res.status(500).json({ success: false, message: 'Automation failed', error: error.message });
     }
 });
