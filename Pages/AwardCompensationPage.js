@@ -20,9 +20,10 @@ async function awardCompensation(page,browser,body, res,
     }
     
     try{
-    // Clicking the Award Compensation Button
-    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:commandToolbarButton1', { visible: true });
-    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:commandToolbarButton1 a');
+    await page.$eval(
+    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:commandToolbarButton1 a',
+    el => el.click()
+    );
     }
     catch(error){
         await page.waitForSelector('tr.p_AFReadOnly td.x51');
