@@ -78,7 +78,9 @@ app.post('/automate-login', async (req, res) => {
             UAESchoolSupportProgram,
         );
         }
-        res.status(500).json({ success: false, message: 'Automation failed', error: error.message });
+        else{
+        res.status(500).json({ success: false, message: 'Automation failed .Please try Again', error: error.message });
+        }
     }
     }
     catch(error){
