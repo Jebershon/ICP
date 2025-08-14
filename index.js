@@ -33,7 +33,7 @@ app.post('/automate-login', async (req, res) => {
     try {
     // Continue with your Puppeteer automation using the extracted values
     try {
-        const browser = await puppeteer.launch({ headless: false }); // Set true if you don't want UI
+        const browser = await puppeteer.launch({ headless: true }); // Set true if you don't want UI
         const page = await browser.newPage();
         await Scenario(res,req.body,page, browser, username, password,url,
         Login, 
@@ -78,7 +78,9 @@ app.post('/automate-login', async (req, res) => {
             UAESchoolSupportProgram,
         );
         }
-        res.status(500).json({ success: false, message: 'Automation failed', error: error.message });
+        else{
+        res.status(500).json({ success: false, message: 'Automation failed .Please try Again', error: error.message });
+        }
     }
     }
     catch(error){
