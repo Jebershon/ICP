@@ -33,7 +33,7 @@ app.post('/automate-login', async (req, res) => {
     try {
     // Continue with your Puppeteer automation using the extracted values
     try {
-        const browser = await puppeteer.launch({ headless: true }); // Set true if you don't want UI
+        const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']}); // Set true if you don't want UI
         const page = await browser.newPage();
         await Scenario(res,req.body,page, browser, username, password,url,
         Login, 
@@ -92,4 +92,5 @@ app.post('/automate-login', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    console.log(`Environment Variables: URL=${process.env.URL}, GCPUSERNAME=${process.env.GCPUSERNAME}, GCPPASSWORD=${process.env.GCPPASSWORD}`);
 });

@@ -1,23 +1,51 @@
-# Use official Node.js 18 image
-FROM node:18
+FROM node:20
+
+# Install system dependencies for Chrome
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    ca-certificates \
+    libnss3 \
+    libnspr4 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxi6 \
+    libxtst6 \
+    libglib2.0-0 \
+    libxrandr2 \
+    libasound2 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libpangocairo-1.0-0 \
+    libpango-1.0-0 \
+    libcups2 \
+    libdrm2 \
+    libgbm1 \
+    fonts-liberation \
+    libappindicator3-1 \
+    xdg-utils \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first
+# Copy package.json first for caching
 COPY package*.json ./
 
-# Install dependencies
+# Install Node dependencies
 RUN npm install
 
-# Force Puppeteer to download Chrome during build
-RUN npx puppeteer browsers install chrome
-
-# Copy all project files
+# Copy rest of the code
 COPY . .
 
-# Expose the port your app listens on
-EXPOSE 3000
+# Copy .env file into image
+COPY .env .env
 
-# Command to start the app
-CMD ["npm", "start"]
+# Install Puppeteer browser
+RUN npx puppeteer browsers install chrome
+
+# Start app
+CMD ["node", "index.js"]
