@@ -17,7 +17,7 @@ async function INDOvertimeRequest(browser, page, body, res) {
         if (!RequestedOvertimeRegular) missingFields.push('RequestedOvertimeRegular');
         if (!RequestedOvertimeWeekend) missingFields.push('RequestedOvertimeWeekend');
         if (!RequestedOvertimePublicHolidays) missingFields.push('RequestedOvertimePublicHolidays');
-        return res.status(400).json({ error: 'Missing required fields', missingFields });
+        return res.status(400).json({ success: false, error: 'Missing required fields: ' + joinList(missingFields, ', ') });
     }
     
     //Begin form
@@ -105,7 +105,7 @@ async function INDOvertimeRequest(browser, page, body, res) {
         errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span',(el) => el.textContent.trim());
         await page.click('#_FOd1\\:\\:msgDlg\\:\\:cancel');
         browser.close();
-        return res.status(200).json({ message: errorMessage });
+        return res.status(200).json({ success: true, message: errorMessage });
     } catch (error) {
         console.log('No error message displayed, proceeding with the request.');
     }

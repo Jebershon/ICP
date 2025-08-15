@@ -22,7 +22,7 @@ async function UAESchoolSupportProgram(browser, page, body, res) {
     if (!Child) missingFields.push('Child');
     if (missingFields.length > 0) {
         await browser.close();
-        return res.status(400).json({ error: `Missing required field(s): ${missingFields.join(', ')}` });
+        return res.status(400).json({ success:false,error: "Missing required field(s): "+missingFields.join(', ')});
     }
 
     // Open Plans Dropdown
@@ -100,8 +100,9 @@ async function UAESchoolSupportProgram(browser, page, body, res) {
             }, AcademicYear); 
             await page.keyboard.press('Tab');
         }else{
+            await browser.close();
             console.log("Error occurred while selecting Academic Year:", error);
-            res.status(500).json({ error: "Error occurred while selecting Academic Year." });
+            res.status(400).json({success: false, error: "Error occurred while selecting Academic Year." });
         }
     }
 
@@ -145,8 +146,9 @@ async function UAESchoolSupportProgram(browser, page, body, res) {
             }, ClaimType);
 
         }else{
+            await browser.close();
             console.log("Error occurred while selecting Claim Type:", error);
-            res.status(500).json({ error: "Error occurred while selecting Claim Type." });
+            res.status(400).json({ success: false, error: "Error occurred while selecting Claim Type." });
         }
     }
 
@@ -190,8 +192,9 @@ async function UAESchoolSupportProgram(browser, page, body, res) {
             }
             }, SchoolFeeType);
         }else{
+            await browser.close();
             console.log("Error occurred while selecting School Fee Type:", error);
-            res.status(500).json({ error: "Error occurred while selecting School Fee Type." });
+            res.status(400).json({success: false, error: "Error occurred while selecting School Fee Type." });
         }
     }
     }
@@ -278,8 +281,9 @@ async function UAESchoolSupportProgram(browser, page, body, res) {
             throw new Error("No child exist with this provided name: " + Child);
             }
         }else{
+            await browser.close();
             console.log("Error occurred while selecting Child:", error);
-            res.status(500).json({ error: "Error occurred while selecting Child." });
+            res.status(400).json({success: false, error: "Error occurred while selecting Child." });
         }
     }
     
@@ -288,8 +292,8 @@ async function UAESchoolSupportProgram(browser, page, body, res) {
         await page.waitForSelector('#DhtmlZOrderManagerLayerContainer #_FOd1\\:\\:popup-container', { visible: true, timeout: 3000 });
         errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span',(el) => el.textContent.trim());
         await page.click('#_FOd1\\:\\:msgDlg\\:\\:cancel');
-        browser.close();
-        return res.status(200).json({ message: errorMessage });
+        await browser.close();
+        return res.status(200).json({ success:true,message: errorMessage });
     } catch (error) {
         console.log('No error message displayed, proceeding with the request.');
     }

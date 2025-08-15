@@ -9,7 +9,7 @@ async function UAECommunicationAllowance(browser, page, body, res) {
     if (!PaymentType) missingFields.push('PaymentType');
     if (missingFields.length > 0) {
         await browser.close();
-        return res.status(400).json({ error: `Missing required field(s): ${missingFields.join(', ')}` });
+        return res.status(400).json({success: false, error: "Missing required field(s): "+missingFields.join(', ')});
     }
 
     // Open Plans Dropdown
@@ -83,8 +83,9 @@ async function UAECommunicationAllowance(browser, page, body, res) {
                 }
             }, PaymentType);
         }else{
+            await browser.close();
             console.log("Error occurred while selecting Payment Type:", error);
-            res.status(500).json({ error: 'Error occurred while selecting Payment Type.' });
+            res.status(400).json({success: false, error: "Error occurred while selecting Payment Type." });
         }
     }
 
@@ -103,8 +104,8 @@ async function UAECommunicationAllowance(browser, page, body, res) {
         await page.waitForSelector('#DhtmlZOrderManagerLayerContainer #_FOd1\\:\\:popup-container', { visible: true, timeout: 3000 });
         errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span',(el) => el.textContent.trim());
         await page.click('#_FOd1\\:\\:msgDlg\\:\\:cancel');
-        browser.close();
-        return res.status(200).json({ message: errorMessage });
+        await browser.close();
+        return res.status(200).json({ success: true, message: errorMessage });
     } catch (error) {
         console.log('No error message displayed, proceeding with the request.');
     }

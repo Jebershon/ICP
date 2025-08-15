@@ -74,12 +74,17 @@ async function KSABusinessTripRequest(browser, page, body, res) {
         Goingto1,
         FlightDuration1
     };
+    const missingFields = [];
     for (const [field, value] of Object.entries(requiredFields)) {
-        if (!value) {
-            await browser.close();
-            return res.status(500).json({ error: `Missing required field: ${field}` });
-        }
+    if (!value) {
+        missingFields.push(field);
     }
+    }
+    if (missingFields.length > 0) {
+    await browser.close();
+    return res.status(400).json({success: false, error: `Missing required fields: ${missingFields.join(', ')}`});
+    }
+
     
     // Open Plans Dropdown
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:drop');
@@ -139,8 +144,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
         }
     }, TripLocation1);
     }catch(error){
+        await browser.close();
         console.log("Error in Trip Location1 :",error);
-        res.status(500).send("Error selecting Trip Location1. Please try again.");
+        res.status(400).json({success: false, error:"Error selecting Trip Location1. Please try again."});
     }
 
     // Start Date1
@@ -212,8 +218,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, FlightDuration1);
         }else{
+            await browser.close();
             console.log("Error in Flight Duration1 :",error);
-            res.status(500).send("Error selecting Flight Duration1. Please try again.");
+            res.status(400).json({success: false, error: "Error selecting Flight Duration1. Please try again."});
         }
     }           
 
@@ -256,8 +263,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, TicketRequired1); 
         }else{
+            await browser.close();
             console.log("Error selecting Ticket Required1:", error);
-            res.status(500).send("Error selecting Ticket Required1. Please try again.");
+            res.status(400).json({success: false, error:"Error selecting Ticket Required1. Please try again."});
         }
     }
 
@@ -324,8 +332,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, HotelBooking1); // Replace PaymentMethod with a string like "Cash"
         }else{
+            await browser.close();
             console.log("Error occurred while selecting Hotel Booking1");
-            res.status(500).send("Error selecting Hotel Booking1. Please try again.");
+            res.status(400).json({success: false, error: "Error selecting Hotel Booking1. Please try again."});
         }
     }
 
@@ -402,8 +411,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, TripLocation2);
         }else{
+            await browser.close();
             console.log("Error occurred while selecting Trip Location 2");
-            res.status(500).send("Error selecting Trip Location 2. Please try again.");
+            res.status(400).json({success: false, error:"Error selecting Trip Location 2. Please try again."}); 
         }
     }
 
@@ -476,8 +486,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, FlightDuration2);
         }else{
+            await browser.close();
             console.log("Error selecting Flight Duration2:", error);
-            res.status(500).send("Error selecting Flight Duration2. Please try again.");
+            res.status(400).json({success: false, error:"Error selecting Flight Duration2. Please try again."});
         }
     }
 
@@ -520,8 +531,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, TicketRequired2);
         }else{
+            await browser.close();
             console.error("Error selecting Ticket Required2:", error);
-            res.status(500).send("Error selecting Ticket Required2. Please try again.");
+            res.status(400).json({success: false, error:"Error selecting Ticket Required2. Please try again."});
         }
     }
 
@@ -590,8 +602,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, HotelBooking2); // Example: "Cash" or "Agent Arrangement"
         }else{
+            await browser.close();
             console.log("Error occurred while selecting hotel booking 2");
-            res.status(500).send("Error occurred while selecting hotel booking 2");
+            res.status(400).json({success: false, error:"Error occurred while selecting hotel booking 2"});
         }
     }
 
@@ -669,8 +682,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, TripLocation3); // e.g., "Middle East, Africa, the India"
         }else{
+            await browser.close();
             console.error('Error occurred while selecting Trip Location 3:', error);
-            res.status(500).send('Error occurred while selecting Trip Location 3');
+            res.status(400).json({success: false, error:'Error occurred while selecting Trip Location 3'});
         }
     }
 
@@ -745,8 +759,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, TicketRequired3); // Example values: "Yes" or "No"
         }else{
+            await browser.close();
             console.log("Error selecting Ticket Required3:", error);
-            res.status(500).send("Error selecting Ticket Required3. Please try again.");
+            res.status(400).json({success: false, error:"Error selecting Ticket Required3. Please try again."});
         }
     }   
 
@@ -791,8 +806,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, FlightDuration3); // Pass a string like "Less Than 10 Hours" or "More Than 10 Hours"
         }else{
+            await browser.close();
             console.error("Error selecting Flight Duration3:", error);
-            res.status(500).send("Error selecting Flight Duration3. Please try again.");
+            res.status(400).json({success: false, error:"Error selecting Flight Duration3. Please try again."});
         }
     }
 
@@ -862,8 +878,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
             }, HotelBooking3); // Example: "Agent Arrangement" or "Cash"
         }
         else{
+            await browser.close();
             console.error("Error selecting Hotel Booking3:", error);
-            res.status(500).send({ message: "Error selecting Hotel Booking3. Please try again." });
+            res.status(400).json({success: false, error: "Error selecting Hotel Booking3. Please try again." });
         }
     }
 
@@ -942,8 +959,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, TripLocation4); // e.g., "Middle East, Africa, the India"
         }else{
+            await browser.close();
             console.error("Error selecting Trip Location4:", error);
-            res.status(500).send({ message: "Error selecting Trip Location4. Please try again." });
+            res.status(400).json({success: false, error:"Error selecting Trip Location4. Please try again."});
         }
     }
 
@@ -1018,8 +1036,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, FlightDuration4); // Example: "Less Than 10 Hours" or "More Than 10 Hours"
         }else{
+            await browser.close();
             console.error('Failed to select Flight Duration:', error);
-            res.status(500).json({ message: 'Failed to select Flight Duration. Please try again.' });
+            res.status(400).json({success: false, error:'Failed to select Flight Duration. Please try again.'});
         }
     }
 
@@ -1062,8 +1081,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, TicketRequired4); // Example: "Yes" or "No"
         }else{
+            await browser.close();
             console.error('Failed to select Ticket Required:', error);
-            res.status(500).json({ message: 'Failed to select Ticket Required. Please try again.' });
+            res.status(400).json({success: false, error:'Failed to select Ticket Required. Please try again.'});
         }
     }
 
@@ -1130,8 +1150,9 @@ async function KSABusinessTripRequest(browser, page, body, res) {
                 }
             }, HotelBooking4); // Example: "Agent Arrangement" or "Cash"
         }else{
+            await browser.close();
             console.error('Failed to select Hotel Booking:', error);
-            res.status(500).json({ message: 'Failed to select Hotel Booking. Please try again.' });
+            res.status(400).json({success: false, error:'Failed to select Hotel Booking. Please try again.'});
         }
     }
 
@@ -1188,8 +1209,8 @@ async function KSABusinessTripRequest(browser, page, body, res) {
         await page.waitForSelector('#DhtmlZOrderManagerLayerContainer #_FOd1\\:\\:popup-container', { visible: true, timeout: 3000 });
         errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span',(el) => el.textContent.trim());
         await page.click('#_FOd1\\:\\:msgDlg\\:\\:cancel');
-        browser.close();
-        return res.status(200).json({ message: errorMessage });
+        await browser.close();
+        return res.status(200).json({ success: true, message: errorMessage });
     } catch (error) {
         console.log('No error message displayed, proceeding with the request.');
     }

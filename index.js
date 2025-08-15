@@ -79,13 +79,13 @@ app.post('/automate-login', async (req, res) => {
         );
         }
         else{
-        res.status(500).json({ success: false, message: 'Automation failed .Please try Again', error: error.message });
+        res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
         }
     }
     }
     catch(error){
         console.error('Error occurred during automation:', error);
-        res.status(500).json({ success: false, message: 'Automation failed', error: error.message });
+        res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
     }
 });
 
