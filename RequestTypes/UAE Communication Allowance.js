@@ -1,3 +1,5 @@
+const { error } = require("winston");
+
 async function UAECommunicationAllowance(browser, page, body, res) {
     // Destructure required fields from req.body
     const { plan, option, PaymentType, OverrideAmountAbsenceDays} = body;
@@ -105,7 +107,7 @@ async function UAECommunicationAllowance(browser, page, body, res) {
         errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span',(el) => el.textContent.trim());
         await page.click('#_FOd1\\:\\:msgDlg\\:\\:cancel');
         await browser.close();
-        return res.status(400).json({ success: false, message: errorMessage });
+        return res.status(400).json({ success: false, error: errorMessage });
     } catch (error) {
         console.log('No error message displayed, proceeding with the request.');
     }
