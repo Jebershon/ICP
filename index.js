@@ -50,7 +50,7 @@ app.post('/automate-login', async (req, res) => {
         UAEOvertimeRequest,
         UAESchoolSupportProgram,
         );
-        res.json({ success: true, message: 'Request has been Successfully Submitted in Oracle Fusion' });
+        return res.status(200).json({ success: true, message: 'Request has been Successfully Submitted in Oracle Fusion' });
     } catch (error) {
         // Handle any errors that occur during the automation
         console.error('Automation Error:', error);
@@ -77,15 +77,16 @@ app.post('/automate-login', async (req, res) => {
             UAEOvertimeRequest,
             UAESchoolSupportProgram,
         );
+        return res.status(200).json({ success: true, message: 'Request has been Successfully Submitted in Oracle Fusion' });
         }
         else{
-        res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
+        return res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
         }
     }
     }
     catch(error){
         console.error('Error occurred during automation:', error);
-        res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
+        return res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
     }
 });
 

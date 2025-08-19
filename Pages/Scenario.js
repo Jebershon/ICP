@@ -15,7 +15,7 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
 
         if (!personNumber) {
             await browser.close();
-            return res.status(400).json({ error: 'Person Number is Missing!' });
+            return res.status(400).json({ success: false, error: 'Person Number is Missing!' });
         }
 
         //Login to Oracle Fusion

@@ -16,7 +16,7 @@ async function awardCompensation(page,browser,body, res,
     // Validate required fields
     if (!plan) {
         await browser.close();
-        return res.status(400).json({ error: 'Plan is Missing!' });
+        return res.status(400).json({ success: false, error: 'Plan is Missing!' });
     }
     
     try{
@@ -32,7 +32,7 @@ async function awardCompensation(page,browser,body, res,
         const elements = document.querySelectorAll('tr.p_AFReadOnly td.x51');
         return Array.from(elements).map(el => el.innerText.trim()).filter(Boolean);
         });
-        return res.status(400).json({ error: 'Warning - Individual Compensation: ' + messages.join(', ') });
+        return res.status(400).json({ success: false, error: 'Warning - Individual Compensation: ' + messages.join(', ') });
     }
 
     try{
@@ -79,7 +79,7 @@ async function awardCompensation(page,browser,body, res,
     }
     else {
         await browser.close();
-        return res.status(400).json({ error: 'Invalid plan name' });
+        return res.status(400).json({ success: false, error: 'Invalid plan name' });
     }
 
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
@@ -97,7 +97,7 @@ async function awardCompensation(page,browser,body, res,
         errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span',(el) => el.textContent.trim());
         await page.click('#_FOd1\\:\\:msgDlg\\:\\:cancel');
         browser.close();
-        return res.status(200).json({ error: errorMessage });
+        return res.status(400).json({ success: false, error: errorMessage });
     } catch (error) {
         console.log('No error message displayed, proceeding with the request.');
     }
