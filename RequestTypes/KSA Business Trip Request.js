@@ -1,6 +1,6 @@
-const e = require("express");
-const { error } = require("winston");
-
+function exists(value) {
+  return value !== null && value !== undefined;
+}
 async function KSABusinessTripRequest(browser, page, body, res) {
     // Destructure required fields from req.body
     const {
@@ -358,19 +358,11 @@ async function KSABusinessTripRequest(browser, page, body, res) {
     //TRIP 2(optional)
     //------------------------
     if(
-        TripLocation2 !== "" || TripLocation2 !== null &&
-        StartDate2 !== "" || StartDate2 !== null &&
-        EndDate2 !== "" || EndDate2 !== null &&
-        LeavingFrom2 !== "" || LeavingFrom2 !== null &&
-        Goingto2 !== "" || Goingto2 !== null &&
-        FlightDuration2 !== "" || FlightDuration2 !== null &&
-        TicketRequired2 !== "" || TicketRequired2 !== null &&
-        DepartureTime2 !== "" || DepartureTime2 !== null &&
-        DurationInDays2 !== "" || DurationInDays2 !== null &&
-        TicketClass2 !== "" || TicketClass2 !== null &&
-        HotelBooking2 !== "" || HotelBooking2 !== null &&
-        HotelPrice2 !== "" || HotelPrice2 !== null &&
-        PerDiem2 !== "" || PerDiem2 !== null
+        exists(TripLocation2) || exists(StartDate2) || exists(EndDate2) ||
+        exists(LeavingFrom2) || exists(Goingto2) || exists(FlightDuration2) ||
+        exists(TicketRequired2) || exists(DepartureTime2) || exists(DurationInDays2) ||
+        exists(TicketClass2) || exists(HotelBooking2) || exists(HotelPrice2) ||
+        exists(PerDiem2)
     ){
     //Travel location2
     try{
@@ -624,24 +616,17 @@ async function KSABusinessTripRequest(browser, page, body, res) {
     await page.keyboard.press('Backspace');
     await page.type(inputSelectorPerDiem2, PerDiem2); // e.g., "400"
     await page.keyboard.press('Tab');
+
     }
 
     //TRIP 3(Optional)
     //------------------------
     if(
-        TripLocation3 !== "" || TripLocation3 !== null &&
-        StartDate3 !== "" || StartDate3 !== null &&
-        EndDate3 !== "" || EndDate3 !== null &&
-        LeavingFrom3 !== "" || LeavingFrom3 !== null &&
-        Goingto3 !== "" || Goingto3 !== null &&
-        FlightDuration3 !== "" || FlightDuration3 !== null &&
-        TicketRequired3 !== "" || TicketRequired3 !== null &&
-        DepartureTime3 !== "" || DepartureTime3 !== null &&
-        DurationInDays3 !== "" || DurationInDays3 !== null &&
-        TicketClass3 !== "" || TicketClass3 !== null &&
-        HotelBooking3 !== "" || HotelBooking3 !== null &&
-        HotelPrice3 !== "" || HotelPrice3 !== null &&
-        PerDiem3 !== "" || PerDiem3 !== null
+        exists(TripLocation3) || exists(StartDate3) || exists(EndDate3) ||
+        exists(LeavingFrom3) || exists(Goingto3) || exists(FlightDuration3) ||
+        exists(TicketRequired3) || exists(DepartureTime3) || exists(DurationInDays3) ||
+        exists(TicketClass3) || exists(HotelBooking3) || exists(HotelPrice3) ||
+        exists(PerDiem3)
     )
     {
     try{
@@ -905,19 +890,11 @@ async function KSABusinessTripRequest(browser, page, body, res) {
     //------------------------
 
     if(
-        TripLocation4 !== "" || TripLocation4 !== null &&
-        StartDate4 !== "" || StartDate4 !== null &&
-        EndDate4 !== "" || EndDate4 !== null &&
-        LeavingFrom4 !== "" || LeavingFrom4 !== null &&
-        Goingto4 !== "" || Goingto4 !== null &&
-        FlightDuration4 !== "" || FlightDuration4 !== null &&
-        TicketRequired4 !== "" || TicketRequired4 !== null &&
-        DepartureTime4 !== "" || DepartureTime4 !== null &&
-        DurationInDays4 !== "" || DurationInDays4 !== null &&
-        TicketClass4 !== "" || TicketClass4 !== null &&
-        HotelBooking4 !== "" || HotelBooking4 !== null &&
-        HotelPrice4 !== "" || HotelPrice4 !== null &&
-        PerDiem4 !== "" || PerDiem4 !== null
+        exists(TripLocation4) || exists(StartDate4) || exists(EndDate4) ||
+        exists(LeavingFrom4) || exists(Goingto4) || exists(FlightDuration4) ||
+        exists(TicketRequired4) || exists(DepartureTime4) || exists(DurationInDays4) ||
+        exists(TicketClass4) || exists(HotelBooking4) || exists(HotelPrice4) ||
+        exists(PerDiem4)
     ){
     try{
     // Trip Location4
@@ -1175,7 +1152,7 @@ async function KSABusinessTripRequest(browser, page, body, res) {
     }
 
     //Totals
-    if(TotalPerDiem !== '' || TotalPerDiem !== null) {
+    if(exists(TotalPerDiem)){
     // Total Per Diem
     const inputSelectorTotalPerDiem4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:58\\:screenEntryValue\\:\\:content"]';
     await page.waitForSelector(inputSelectorTotalPerDiem4, { visible: true });
@@ -1185,7 +1162,7 @@ async function KSABusinessTripRequest(browser, page, body, res) {
     await page.keyboard.press('Tab');
     }
 
-    if(TotalHotelPrice !== '' || TotalHotelPrice !== null) {
+    if(exists(TotalHotelPrice)) {
     // Total Hotel Price
     const inputSelectorTotalHotelPrice4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:59\\:screenEntryValue\\:\\:content"]';
     await page.waitForSelector(inputSelectorTotalHotelPrice4, { visible: true });
@@ -1195,7 +1172,7 @@ async function KSABusinessTripRequest(browser, page, body, res) {
     await page.keyboard.press('Tab');
     }
 
-    if(PayValue !== '' || PayValue !== null) {
+    if(exists(PayValue)) {
     // Pay Value
     const inputSelectorPayValue4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:68\\:screenEntryValueNumber\\:\\:content"]';
     await page.waitForSelector(inputSelectorPayValue4, { visible: true });

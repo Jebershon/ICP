@@ -32,6 +32,7 @@ async function awardCompensation(page,browser,body, res,
         const elements = document.querySelectorAll('tr.p_AFReadOnly td.x51');
         return Array.from(elements).map(el => el.innerText.trim()).filter(Boolean);
         });
+        await browser.close();
         return res.status(400).json({ success: false, error: 'Warning - Individual Compensation: ' + messages.join(', ') });
     }
 

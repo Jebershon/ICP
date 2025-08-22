@@ -33,7 +33,7 @@ app.post('/automate-login', async (req, res) => {
     try {
     // Continue with your Puppeteer automation using the extracted values
     try {
-        const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']}); // Set true if you don't want UI
+        const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox']}); // Set true if you don't want UI
         const page = await browser.newPage();
         await Scenario(res,req.body,page, browser, username, password,url,
         Login, 
