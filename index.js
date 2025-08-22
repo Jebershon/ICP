@@ -33,7 +33,7 @@ app.post('/automate-login', async (req, res) => {
     try {
     // Continue with your Puppeteer automation using the extracted values
     try {
-        const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox']}); // Set true if you don't want UI
+        const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']}); // Set true if you don't want UI
         const page = await browser.newPage();
         await Scenario(res,req.body,page, browser, username, password,url,
         Login, 
@@ -50,6 +50,7 @@ app.post('/automate-login', async (req, res) => {
         UAEOvertimeRequest,
         UAESchoolSupportProgram,
         );
+        await browser.close();
         return res.status(200).json({ success: true, message: 'Request has been Successfully Submitted in Oracle Fusion' });
     } catch (error) {
         // Handle any errors that occur during the automation
@@ -61,7 +62,7 @@ app.post('/automate-login', async (req, res) => {
             const browser = await puppeteer.launch({ headless: false }); // Set true if you don't want UI
             const page = await browser.newPage();
             await page.reload({ waitUntil: 'networkidle2' });
-            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 10000)));
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 4000)));
             await Scenario(res,req.body,page, browser, username, password,url,
             Login, 
             PersonManagement, 
@@ -77,14 +78,18 @@ app.post('/automate-login', async (req, res) => {
             UAEOvertimeRequest,
             UAESchoolSupportProgram,
         );
+        await browser.close();
         return res.status(200).json({ success: true, message: 'Request has been Successfully Submitted in Oracle Fusion' });
         }
         else{
+        await browser.close();
+        console.error('Error occurred during automation:', error);
         return res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
         }
     }
     }
     catch(error){
+        await browser.close();
         console.error('Error occurred during automation:', error);
         return res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
     }
