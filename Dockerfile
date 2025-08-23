@@ -41,9 +41,6 @@ RUN npm install
 # Copy rest of the code
 COPY . .
 
-# Copy .env file into image
-COPY .env .env
-
 # Install Puppeteer browser
 RUN npx puppeteer browsers install chrome
 
