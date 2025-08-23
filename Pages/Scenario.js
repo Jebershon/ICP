@@ -43,13 +43,13 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
         );
 
         //Delay
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
 
         //Continue
         await page.waitForFunction(() => {
             const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
             return buttons.some(btn => btn.innerText.replace(/\s+/g, '').includes('Continue'));
-        }, { timeout: 4000 });
+        });
 
         await page.evaluate(() => {
             const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
@@ -62,11 +62,13 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
             }
         });
 
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+        
         //submit
         await page.waitForFunction(() => {
             const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
             return buttons.some(btn => btn.innerText.replace(/\s+/g, '').includes('Submit'));
-        }, { timeout: 4000 });
+        });
         await page.evaluate(() => {
             const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
             for (let btn of buttons) {
@@ -77,10 +79,11 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
                 }
             }
         });
-
+        
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+        
         // Wait for the warning
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okWarningDialog', 
-        { timeout: 4000 });
+        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okWarningDialog');
         await page.evaluate(() => {
             const btn = document.querySelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okWarningDialog');
             if (btn) {
@@ -89,7 +92,7 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
             }
         });
 
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 4000)));
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
         
         //final ok button
         await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okConfirmationDialog');

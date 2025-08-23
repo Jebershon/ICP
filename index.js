@@ -27,46 +27,14 @@ app.use(bodyParser.json());
 
 // Endpoint to automate login and perform actions
 app.post('/automate-login', async (req, res) => {
-    const url = process.env.URL;
-    const username = process.env.GCPUSERNAME;
-    const password = process.env.GCPPASSWORD;
+    const url = process.env.ICP_NODE_URL;
+    const username = process.env.ICP_GCPUSERNAME;
+    const password = process.env.ICP_GCPPASSWORD;
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']}); // Set true if you don't want UI
+    let page = await browser.newPage();
     try {
-    // Continue with your Puppeteer automation using the extracted values
-    try {
-        const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']}); // Set true if you don't want UI
-        const page = await browser.newPage();
-        await Scenario(res,req.body,page, browser, username, password,url,
-        Login, 
-        PersonManagement, 
-        awardCompensation,
-        INDCommunicationAllowance,
-        INDOvertimeRequest,
-        KSABuisnessTripRequest,
-        KSACommunicationAllowance,
-        KSAOvertimeRequest,
-        KSASchoolSupportProgram,
-        UAEBusinessTripRequest,
-        UAECommunicationAllowance,
-        UAEOvertimeRequest,
-        UAESchoolSupportProgram,
-        );
-        await browser.close();
-        return res.status(200).json({ success: true, message: 'Request has been Successfully Submitted in Oracle Fusion' });
-    } catch (error) {
-        // Handle any errors that occur during the automation
-        console.error('Automation Error:', error);
-        if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')) {
-            const url = process.env.URL;
-            const username = process.env.GCPUSERNAME;
-            const password = process.env.GCPPASSWORD;
-            const browser = await puppeteer.launch({ headless: false }); // Set true if you don't want UI
-            const page = await browser.newPage();
-            await page.reload({ waitUntil: 'networkidle2' });
-            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 4000)));
-            await Scenario(res,req.body,page, browser, username, password,url,
-            Login, 
-            PersonManagement, 
-            awardCompensation,
+        try {
+            await Scenario(res,req.body,page, browser, username, password,url, Login, PersonManagement, awardCompensation,
             INDCommunicationAllowance,
             INDOvertimeRequest,
             KSABuisnessTripRequest,
@@ -77,26 +45,52 @@ app.post('/automate-login', async (req, res) => {
             UAECommunicationAllowance,
             UAEOvertimeRequest,
             UAESchoolSupportProgram,
-        );
-        await browser.close();
-        return res.status(200).json({ success: true, message: 'Request has been Successfully Submitted in Oracle Fusion' });
+            );
+            await browser.close();
+            return res.status(200).json({ success: true, message: 'Request has been Successfully Submitted in Oracle Fusion' });
+        } catch (error) {
+            if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element') || error.message.includes('detached Frame') || error.message.includes('Cannot set headers after they are sent to the client')){
+                console.error('Trying in new Browser page');
+                await browser.deleteCookie(...(await browser.cookies()));
+                await page.close();
+                page = await browser.newPage();
+                await Scenario(res,req.body,page, browser, username, password,url, Login, PersonManagement, awardCompensation,
+                INDCommunicationAllowance,
+                INDOvertimeRequest,
+                KSABuisnessTripRequest,
+                KSACommunicationAllowance,
+                KSAOvertimeRequest,
+                KSASchoolSupportProgram,
+                UAEBusinessTripRequest,
+                UAECommunicationAllowance,
+                UAEOvertimeRequest,
+                UAESchoolSupportProgram,
+            );
+            await browser.close();
+            return res.status(200).json({ success: true, message: 'Request has been Successfully Submitted in Oracle Fusion' });
+            }
+            else{
+            await browser.close();
+            console.error('Error occurred during automation:', error);
+            return res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
+            }
         }
-        else{
-        await browser.close();
-        console.error('Error occurred during automation:', error);
-        return res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
-        }
-    }
     }
     catch(error){
         await browser.close();
         console.error('Error occurred during automation:', error);
         return res.status(400).json({ success: false, error: 'Automation failed : Please try Again!, '+error.message });
+    }finally {
+        await browser.close();
     }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    console.log(`Environment Variables: URL=${process.env.URL}, GCPUSERNAME=${process.env.GCPUSERNAME}, GCPPASSWORD=${process.env.GCPPASSWORD}`);
+    if (process.env.ICP_NODE_URL && process.env.ICP_GCPUSERNAME && process.env.ICP_GCPPASSWORD) {
+        console.log('env successfully recognized...');
+    } else {
+        console.error('One or more environment variables are missing.');
+    }
 });

@@ -31,6 +31,7 @@ async function KSACommunicationAllowance(browser, page, body, res) {
     // Validation Time for the plan
     await new Promise(resolve => setTimeout(resolve, 2000));
 
+    try{
     // Open Options Dropdown
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
@@ -44,6 +45,11 @@ async function KSACommunicationAllowance(browser, page, body, res) {
             }
         }
     }, option);
+    }catch(error){
+        await browser.close();
+        console.error('plan may not available:', error);
+        return res.status(400).json({  success: false, error: 'plan may not available:' });
+    }
 
     // Delay for option selection
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
@@ -84,9 +90,7 @@ async function KSACommunicationAllowance(browser, page, body, res) {
                 }
             }, PaymentType);
         }else{
-            await browser.close();
             console.log("Error in Payment Type selection:", error);
-            res.status(400).json({success: false, error:"Error selecting Payment Type. Please try again."});
         }
     }
 

@@ -40,6 +40,7 @@ async function INDOvertimeRequest(browser, page, body, res) {
     // Validation Time for the plan
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
 
+    try{
     // Open Options Dropdown
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
@@ -53,54 +54,107 @@ async function INDOvertimeRequest(browser, page, body, res) {
             }
         }
     }, option);
-
+    }catch(error){
+        await browser.close();
+        console.error('plan may not available:', error);
+        return res.status(400).json({  success: false, error: 'plan may not available:' });
+    }
+    
+    // Validation Time for the option
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
 
-    // From Date
-    const fromDateSelector = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:2\\:screenEntryValueDate\\:\\:content"]';
-    await page.waitForSelector(fromDateSelector, { visible: true });
-    await page.click(fromDateSelector, { clickCount: 3 });
-    await page.keyboard.press('Backspace');
-    await page.type(fromDateSelector, Fromdate); // Replace Fromdate with a string like "08/01/25"
-    await page.keyboard.press('Tab');
+    try{
+        // From Date
+        const fromDateSelector = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:2\\:screenEntryValueDate\\:\\:content"]';
+        await page.waitForSelector(fromDateSelector, { visible: true });
+        await page.click(fromDateSelector, { clickCount: 3 });
+        await page.keyboard.press('Backspace');
+        await page.type(fromDateSelector, Fromdate); // Replace Fromdate with a string like "08/01/25"
+        await page.keyboard.press('Tab');
 
-    // To Date
-    const toDateSelector = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:3\\:screenEntryValueDate\\:\\:content"]';
-    await page.waitForSelector(toDateSelector, { visible: true });
-    await page.click(toDateSelector, { clickCount: 3 });
-    await page.keyboard.press('Backspace');
-    await page.type(toDateSelector, ToDate); // Replace `ToDate` with your actual variable or string like "08/31/25"
-    await page.keyboard.press('Tab');
-    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+        // To Date
+        const toDateSelector = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:3\\:screenEntryValueDate\\:\\:content"]';
+        await page.waitForSelector(toDateSelector, { visible: true });
+        await page.click(toDateSelector, { clickCount: 3 });
+        await page.keyboard.press('Backspace');
+        await page.type(toDateSelector, ToDate); // Replace `ToDate` with your actual variable or string like "08/31/25"
+        await page.keyboard.press('Tab');
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
 
-    // Requested Overtime Regular
-    const inputSelector4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:7\\:screenEntryValueNumber\\:\\:content"]';
-    await page.waitForSelector(inputSelector4, { visible: true });
-    await page.click(inputSelector4, { clickCount: 3 }); // Optional: Select all to replace existing value
-    await page.type(inputSelector4, RequestedOvertimeRegular+'');
+        // Requested Overtime Regular
+        const inputSelector4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:7\\:screenEntryValueNumber\\:\\:content"]';
+        await page.waitForSelector(inputSelector4, { visible: true });
+        await page.click(inputSelector4, { clickCount: 3 }); // Optional: Select all to replace existing value
+        await page.type(inputSelector4, RequestedOvertimeRegular+'');
 
-    // Requested Overtime Weekend
-    const inputSelector5 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:8\\:screenEntryValue\\:\\:content"]';
-    await page.waitForSelector(inputSelector5, { visible: true });
-    await page.click(inputSelector5, { clickCount: 3 }); // Optional: Select all to replace existing value
-    await page.type(inputSelector5, RequestedOvertimeWeekend+'');
+        // Requested Overtime Weekend
+        const inputSelector5 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:8\\:screenEntryValue\\:\\:content"]';
+        await page.waitForSelector(inputSelector5, { visible: true });
+        await page.click(inputSelector5, { clickCount: 3 }); // Optional: Select all to replace existing value
+        await page.type(inputSelector5, RequestedOvertimeWeekend+'');
 
-    // Requested Overtime Public Holidays
-    const inputSelector6 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:9\\:screenEntryValue\\:\\:content"]';
-    await page.waitForSelector(inputSelector6, { visible: true });
-    await page.click(inputSelector6, { clickCount: 3 }); // Selects the whole existing text if any
-    await page.type(inputSelector6, RequestedOvertimePublicHolidays+'');
-    await page.keyboard.press('Tab');
+        // Requested Overtime Public Holidays
+        const inputSelector6 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:9\\:screenEntryValue\\:\\:content"]';
+        await page.waitForSelector(inputSelector6, { visible: true });
+        await page.click(inputSelector6, { clickCount: 3 }); // Selects the whole existing text if any
+        await page.type(inputSelector6, RequestedOvertimePublicHolidays+'');
+        await page.keyboard.press('Tab');
 
-    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
 
-    // Comments
-    const inputSelector7 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:11\\:screenEntryValue\\:\\:content"]';
-    await page.waitForSelector(inputSelector7, { visible: true });
-    await page.click(inputSelector7, { clickCount: 3 }); // Optional: selects existing value
-    await page.type(inputSelector7, Comments+'');
-    await page.keyboard.press('Tab');
+        // Comments
+        const inputSelector7 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:11\\:screenEntryValue\\:\\:content"]';
+        await page.waitForSelector(inputSelector7, { visible: true });
+        await page.click(inputSelector7, { clickCount: 3 }); // Optional: selects existing value
+        await page.type(inputSelector7, Comments+'');
+        await page.keyboard.press('Tab');
+    }catch(error){
+        console.error('Retrying..|Error filling out form:'+plan);
+            // From Date
+        const fromDateSelector = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:2\\:screenEntryValueDate\\:\\:content"]';
+        await page.waitForSelector(fromDateSelector, { visible: true });
+        await page.click(fromDateSelector, { clickCount: 3 });
+        await page.keyboard.press('Backspace');
+        await page.type(fromDateSelector, Fromdate); // Replace Fromdate with a string like "08/01/25"
+        await page.keyboard.press('Tab');
 
+        // To Date
+        const toDateSelector = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:3\\:screenEntryValueDate\\:\\:content"]';
+        await page.waitForSelector(toDateSelector, { visible: true });
+        await page.click(toDateSelector, { clickCount: 3 });
+        await page.keyboard.press('Backspace');
+        await page.type(toDateSelector, ToDate); // Replace `ToDate` with your actual variable or string like "08/31/25"
+        await page.keyboard.press('Tab');
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+
+        // Requested Overtime Regular
+        const inputSelector4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:7\\:screenEntryValueNumber\\:\\:content"]';
+        await page.waitForSelector(inputSelector4, { visible: true });
+        await page.click(inputSelector4, { clickCount: 3 }); // Optional: Select all to replace existing value
+        await page.type(inputSelector4, RequestedOvertimeRegular+'');
+
+        // Requested Overtime Weekend
+        const inputSelector5 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:8\\:screenEntryValue\\:\\:content"]';
+        await page.waitForSelector(inputSelector5, { visible: true });
+        await page.click(inputSelector5, { clickCount: 3 }); // Optional: Select all to replace existing value
+        await page.type(inputSelector5, RequestedOvertimeWeekend+'');
+
+        // Requested Overtime Public Holidays
+        const inputSelector6 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:9\\:screenEntryValue\\:\\:content"]';
+        await page.waitForSelector(inputSelector6, { visible: true });
+        await page.click(inputSelector6, { clickCount: 3 }); // Selects the whole existing text if any
+        await page.type(inputSelector6, RequestedOvertimePublicHolidays+'');
+        await page.keyboard.press('Tab');
+
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+
+        // Comments
+        const inputSelector7 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:11\\:screenEntryValue\\:\\:content"]';
+        await page.waitForSelector(inputSelector7, { visible: true });
+        await page.click(inputSelector7, { clickCount: 3 }); // Optional: selects existing value
+        await page.type(inputSelector7, Comments+'');
+        await page.keyboard.press('Tab');
+    }
     //Wait for error popup
     try{
         await page.waitForSelector('#DhtmlZOrderManagerLayerContainer #_FOd1\\:\\:popup-container', { visible: true, timeout: 3000 });

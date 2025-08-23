@@ -31,6 +31,7 @@ async function UAECommunicationAllowance(browser, page, body, res) {
     // Validation Time for the plan
     await new Promise(resolve => setTimeout(resolve, 2000));
 
+    try{
     // Open Options Dropdown
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
@@ -44,7 +45,12 @@ async function UAECommunicationAllowance(browser, page, body, res) {
             }
         }
     }, option);
-
+    }catch(error){
+        await browser.close();
+        console.error('plan may not available:', error);
+        return res.status(400).json({  success: false, error: 'plan may not available:' });
+    }
+    
     // Delay for option selection
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
 
@@ -85,9 +91,7 @@ async function UAECommunicationAllowance(browser, page, body, res) {
                 }
             }, PaymentType);
         }else{
-            await browser.close();
             console.log("Error occurred while selecting Payment Type:", error);
-            res.status(400).json({success: false, error: "Error occurred while selecting Payment Type." });
         }
     }
 
@@ -99,7 +103,6 @@ async function UAECommunicationAllowance(browser, page, body, res) {
     await page.type('input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:25\\:screenEntryValueNumber\\:\\:content"]', OverrideAmountAbsenceDays); // e.g. "3"
     await page.keyboard.press('Tab');
     }
-
 
     //Wait for error popup
     try{

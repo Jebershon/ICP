@@ -47,23 +47,25 @@ async function awardCompensation(page,browser,body, res,
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:commandToolbarButton1 a');
     }
 
+    console.log('plan name:', plan);
+
     //Call function based on plan name
-    if (plan === 'IND Communication Allowance') { //Completed
+    if (plan === 'IND Communication Allowance') { 
         await INDCommunicationAllowance(browser, page, body, res);
     }
-    else if (plan === 'IND Overtime Request') { //Completed
+    else if (plan === 'IND Overtime Request') { 
         await INDOvertimeRequest(browser, page, body, res);
     }
-    else if (plan === 'KSA Business Trip Request') { //in progress
+    else if (plan === 'KSA Business Trip Request') { 
         await KSABusinessTripRequest(browser, page, body, res);
     }
-    else if (plan === 'KSA Communication allowance') { //Completed 
+    else if (plan === 'KSA Communication allowance') { 
         await KSACommunicationAllowance(browser, page, body, res);
     }  
-    else if (plan === 'KSA Overtime Request') { //Completed
+    else if (plan === 'KSA Overtime Request') { 
         await KSAOvertimeRequest(browser, page, body, res);
     }
-    else if (plan === 'KSA School Support Program') { //in progress
+    else if (plan === 'KSA School Support Program') { 
         await KSASchoolSupportProgram(browser, page, body, res);
     }   
     else if (plan === 'UAE Business Trip Request') {
@@ -88,10 +90,23 @@ async function awardCompensation(page,browser,body, res,
    // Submit request button
     const submitButtonSelector = '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:d2\\:\\:ok';
     await page.waitForSelector(submitButtonSelector, { visible: true });
-    await page.click(submitButtonSelector, { delay: 1000 });
+    await page.click(submitButtonSelector);
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
 
-    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
-
+    //Wait for error popup
+    const errorSelector = '[id*="msgDlg"] [class*="x1mu"]';
+    for (let i = 0; i < 3; i++) {
+    try {
+        await page.waitForSelector(errorSelector, { visible: true, timeout: 2000 });
+        const errorText = await page.$eval(errorSelector, el => el.innerText.trim());
+        await browser.close();
+        return res.status(400).json({ success: false, error: errorText });
+    } catch (e) {
+        await new Promise(r => setTimeout(r, 1000));
+        console.log('attempting to find error message : ' + i);
+    }
+    }
+    
     // Wait for the confirmation message
     try{
         await page.waitForSelector('#DhtmlZOrderManagerLayerContainer #_FOd1\\:\\:popup-container', { visible: true, timeout: 3000 });
