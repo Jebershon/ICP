@@ -1,21 +1,24 @@
 const { error } = require("winston");
+const AutomationError = require("../Utils/CustomError");
 
-async function UAESchoolSupportProgram(browser, page, body, res) {
+async function UAESchoolSupportProgram(browser, page, body, res, plan, personNumber, RequestID, HandleResponse) {
     // Destructure required fields from req.body
-    const { 
-        plan, 
-        option, 
-        ToDate, 
-        Fromdate, 
-        AcademicYear, 
-        ClaimType, 
-        SchoolFeeType, 
-        PaidAmount, 
-        Child 
+    const {
+        option,
+        ToDate,
+        Fromdate,
+        AcademicYear,
+        ClaimType,
+        SchoolFeeType,
+        PaidAmount,
+        Child
     } = body;
+
+    console.log('validating fields of :' + plan);
 
     // Validate required fields
     const missingFields = [];
+    if (!option) missingFields.push('option');
     if (!ToDate) missingFields.push('ToDate');
     if (!Fromdate) missingFields.push('Fromdate');
     if (!AcademicYear) missingFields.push('AcademicYear');
@@ -23,8 +26,7 @@ async function UAESchoolSupportProgram(browser, page, body, res) {
     if (!PaidAmount) missingFields.push('PaidAmount');
     if (!Child) missingFields.push('Child');
     if (missingFields.length > 0) {
-        await browser.close();
-        return res.status(400).json({ success:false,error: "Missing required field(s): "+missingFields.join(', ')});
+        throw new AutomationError('Missing required fields: ' + missingFields.join(', '), plan, personNumber, RequestID);
     }
 
     // Open Plans Dropdown
@@ -44,162 +46,148 @@ async function UAESchoolSupportProgram(browser, page, body, res) {
     // Validation Time for the plan
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    try{
-    // Open Options Dropdown
-    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
-    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
-    await page.evaluate((option) => {
-        const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop li');
-        for (let item of items) {
-            if (item.innerText.trim() === option) {
-                item.scrollIntoView();
-                item.click();
-                break;
+    try {
+        // Open Options Dropdown
+        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
+        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
+        await page.evaluate((option) => {
+            const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop li');
+            for (let item of items) {
+                if (item.innerText.trim() === option) {
+                    item.scrollIntoView();
+                    item.click();
+                    break;
+                }
             }
-        }
-    }, option);
-    }catch(error){
-        await browser.close();
+        }, option);
+    } catch (error) {
         console.error('plan may not available:', error);
-        return res.status(400).json({  success: false, error: 'plan may not available:' });
+        throw new AutomationError('plan may not available', plan, personNumber, RequestID);
     }
-    
+
     // Delay for option selection
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
 
-    try{
-        try{
-        // Academic Year select dropdown 
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop');
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-        await page.evaluate((AcademicYear) => {
-            const options = document.querySelectorAll(
-                '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop li'
-            );
-            for (let option of options) {
-                if (option.innerText.trim() === AcademicYear) {
-                    option.scrollIntoView();
-                    option.click();
-                    break;
-                }
-            }
-        }, AcademicYear); 
-        await page.keyboard.press('Tab');
-        }catch(error){
-            if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')){
-                console.log("Error occurred while selecting Academic Year (retrying):", error);
-                // Academic Year select dropdown 
-                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop');
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                await page.evaluate((AcademicYear) => {
-                    const options = document.querySelectorAll(
-                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop li'
-                    );
-                    for (let option of options) {
-                        if (option.innerText.trim() === AcademicYear) {
-                            option.scrollIntoView();
-                            option.click();
-                            break;
-                        }
+    try {
+        try {
+            // Academic Year select dropdown 
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+            await page.evaluate((AcademicYear) => {
+                const options = document.querySelectorAll(
+                    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop li'
+                );
+                for (let option of options) {
+                    if (option.innerText.trim() === AcademicYear) {
+                        option.scrollIntoView();
+                        option.click();
+                        break;
                     }
-                }, AcademicYear); 
-                await page.keyboard.press('Tab');
-            }else{
-                console.log("Error occurred while selecting Academic Year:", error);
-            }
+                }
+            }, AcademicYear);
+            await page.keyboard.press('Tab');
+        } catch (error) {
+            console.log("Error occurred while selecting Academic Year (retrying)");
+            // Academic Year select dropdown 
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+            await page.evaluate((AcademicYear) => {
+                const options = document.querySelectorAll(
+                    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop li'
+                );
+                for (let option of options) {
+                    if (option.innerText.trim() === AcademicYear) {
+                        option.scrollIntoView();
+                        option.click();
+                        break;
+                    }
+                }
+            }, AcademicYear);
+            await page.keyboard.press('Tab');
         }
 
         try {
-        // Claim Type (main section, evIter:31)
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // short delay for stability
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop',{ visible: true });
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop');
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop',{ visible: true });
-        await page.evaluate((ClaimType) => {
-        const options = document.querySelectorAll(
-            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop li'
-        );
-        for (let option of options) {
-            if (option.innerText.trim() === ClaimType) { // "Tuition", "Books", "Transport"
-            option.scrollIntoView();
-            option.click();
-            break;
-            }
-        }
-        }, ClaimType);
-        }catch(error){
-            if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')){
-                console.log("Error occurred while selecting Claim Type (retrying):", error);
-                // Claim Type (main section, evIter:31)
-                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // short delay for stability
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop',{ visible: true });
-                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop');
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop',{ visible: true });
-                await page.evaluate((ClaimType) => {
+            // Claim Type (main section, evIter:31)
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // short delay for stability
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+            await page.evaluate((ClaimType) => {
                 const options = document.querySelectorAll(
                     '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop li'
                 );
                 for (let option of options) {
                     if (option.innerText.trim() === ClaimType) { // "Tuition", "Books", "Transport"
-                    option.scrollIntoView();
-                    option.click();
-                    break;
+                        option.scrollIntoView();
+                        option.click();
+                        break;
                     }
                 }
-                }, ClaimType);
-
-            }else{
-                console.log("Error occurred while selecting Claim Type:", error);
-            }
-        }
-
-        if(SchoolFeeType !== '' || SchoolFeeType !== null || SchoolFeeType !== undefined){
-        try{
-        // School Fee Type (main section, evIter:32)
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop',{ visible: true });
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop');
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop',{ visible: true });
-        await page.evaluate((SchoolFeeType) => {
-        const options = document.querySelectorAll(
-            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop li'
-        );
-        for (let option of options) {
-            if (option.innerText.trim() === SchoolFeeType) { // e.g., "Monthly"
-            option.scrollIntoView();
-            option.click();
-            break;
-            }
-        }
-        }, SchoolFeeType);
-        }catch(error){
-            if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')){
-                console.log("Error occurred while selecting School Fee Type (retrying):", error);
-                // School Fee Type (main section, evIter:32)
-                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop',{ visible: true });
-                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop');
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop',{ visible: true });
-                await page.evaluate((SchoolFeeType) => {
+            }, ClaimType);
+        } catch (error) {
+            console.log("Error occurred while selecting Claim Type (retrying)");
+            // Claim Type (main section, evIter:31)
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // short delay for stability
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+            await page.evaluate((ClaimType) => {
                 const options = document.querySelectorAll(
-                    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop li'
+                    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop li'
                 );
                 for (let option of options) {
-                    if (option.innerText.trim() === SchoolFeeType) { // e.g., "Monthly"
-                    option.scrollIntoView();
-                    option.click();
-                    break;
+                    if (option.innerText.trim() === ClaimType) { // "Tuition", "Books", "Transport"
+                        option.scrollIntoView();
+                        option.click();
+                        break;
                     }
                 }
-                }, SchoolFeeType);
-            }else{
-                console.log("Error occurred while selecting School Fee Type:", error);
-            }
+            }, ClaimType);
         }
+
+        if (SchoolFeeType !== '' || SchoolFeeType !== null || SchoolFeeType !== undefined) {
+            try {
+                // School Fee Type (main section, evIter:32)
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop');
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((SchoolFeeType) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === SchoolFeeType) { // e.g., "Monthly"
+                            option.scrollIntoView();
+                            option.click();
+                            break;
+                        }
+                    }
+                }, SchoolFeeType);
+            } catch (error) {
+                console.log("Error occurred while selecting School Fee Type (retrying)");
+                // School Fee Type (main section, evIter:32)
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop');
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((SchoolFeeType) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === SchoolFeeType) { // e.g., "Monthly"
+                            option.scrollIntoView();
+                            option.click();
+                            break;
+                        }
+                    }
+                }, SchoolFeeType);
+            }
         }
 
         // -------- From Date --------
@@ -229,198 +217,181 @@ async function UAESchoolSupportProgram(browser, page, body, res) {
         // Delay 
         await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
 
-        try{
-        // -------- Child --------
-        const inputSelectorChildMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:content"]';
-        await page.waitForSelector(inputSelectorChildMain, { visible: true });
-        await page.click(inputSelectorChildMain, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelectorChildMain, Child); // e.g. "2"
+        try {
+            // -------- Child --------
+            const inputSelectorChildMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:content"]';
+            await page.waitForSelector(inputSelectorChildMain, { visible: true });
+            await page.click(inputSelectorChildMain, { clickCount: 3 });
+            await page.keyboard.press('Backspace');
+            await page.type(inputSelectorChildMain, Child); // e.g. "2"
 
-        // Wait for the suggestions to appear
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
-        const childFound = await page.evaluate((selector, childName) => {
-        const items = document.querySelectorAll(selector);
-        for (let item of items) {
-            if (item.innerText.trim() === childName) {
-            item.click();
-            return true; // Found and clicked
-            }
-            if (item.innerText.trim().toLowerCase() === "No results found.".toLowerCase()) {
-            return false;
-            }
-        }
-        return false; // Not found
-        }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
-        if (!childFound) {
-        throw new Error("No child exist with this provided name: " + Child);
-        }
-        }catch(error){
-            if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')){
-                console.log("Retrying selecting Child:", error);
-                // -------- Child --------
-                const inputSelectorChildMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:content"]';
-                await page.waitForSelector(inputSelectorChildMain, { visible: true });
-                await page.click(inputSelectorChildMain, { clickCount: 3 });
-                await page.keyboard.press('Backspace');
-                await page.type(inputSelectorChildMain, Child); // e.g. "2"
-
-                // Wait for the suggestions to appear
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
-                const childFound = await page.evaluate((selector, childName) => {
+            // Wait for the suggestions to appear
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
+            const childFound = await page.evaluate((selector, childName) => {
                 const items = document.querySelectorAll(selector);
                 for (let item of items) {
                     if (item.innerText.trim() === childName) {
-                    item.click();
-                    return true; // Found and clicked
+                        item.click();
+                        return true; // Found and clicked
                     }
                     if (item.innerText.trim().toLowerCase() === "No results found.".toLowerCase()) {
-                    return false;
+                        return false;
                     }
                 }
                 return false; // Not found
-                }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
-                if (!childFound) {
-                throw new Error("No child exist with this provided name: " + Child);
+            }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
+        } catch (error) {
+            console.log("Retrying selecting Child:", error);
+            // -------- Child --------
+            const inputSelectorChildMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:content"]';
+            await page.waitForSelector(inputSelectorChildMain, { visible: true });
+            await page.click(inputSelectorChildMain, { clickCount: 3 });
+            await page.keyboard.press('Backspace');
+            await page.type(inputSelectorChildMain, Child); // e.g. "2"
+
+            // Wait for the suggestions to appear
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
+            const childFound = await page.evaluate((selector, childName) => {
+                const items = document.querySelectorAll(selector);
+                for (let item of items) {
+                    if (item.innerText.trim() === childName) {
+                        item.click();
+                        return true; // Found and clicked
+                    }
+                    if (item.innerText.trim().toLowerCase() === "No results found.".toLowerCase()) {
+                        return false;
+                    }
                 }
-            }else{
-                console.log("Error occurred while selecting Child:", error);
+                return false; // Not found
+            }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
+            if (!childFound) {
+                throw new AutomationError('No child exist with this provided name: ' + Child, plan, personNumber, RequestID);
             }
         }
-    }catch(error){
-        console.log("Retrying..|Error occurred while filling form : "+plan);
-        try{
-        // Academic Year select dropdown 
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop');
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-        await page.evaluate((AcademicYear) => {
-            const options = document.querySelectorAll(
-                '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop li'
-            );
-            for (let option of options) {
-                if (option.innerText.trim() === AcademicYear) {
-                    option.scrollIntoView();
-                    option.click();
-                    break;
-                }
-            }
-        }, AcademicYear); 
-        await page.keyboard.press('Tab');
-        }catch(error){
-            if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')){
-                console.log("Error occurred while selecting Academic Year (retrying):", error);
-                // Academic Year select dropdown 
-                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop');
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                await page.evaluate((AcademicYear) => {
-                    const options = document.querySelectorAll(
-                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop li'
-                    );
-                    for (let option of options) {
-                        if (option.innerText.trim() === AcademicYear) {
-                            option.scrollIntoView();
-                            option.click();
-                            break;
-                        }
+    } catch (error) {
+        if (error instanceof AutomationError) {
+            throw new AutomationError(error.message, error.plan, error.personNumber, error.RequestID);
+        }
+        console.log("Retrying..|Error occurred while filling form : " + plan);
+        try {
+            // Academic Year select dropdown 
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+            await page.evaluate((AcademicYear) => {
+                const options = document.querySelectorAll(
+                    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop li'
+                );
+                for (let option of options) {
+                    if (option.innerText.trim() === AcademicYear) {
+                        option.scrollIntoView();
+                        option.click();
+                        break;
                     }
-                }, AcademicYear); 
-                await page.keyboard.press('Tab');
-            }else{
-                console.log("Error occurred while selecting Academic Year:", error);
-            }
+                }
+            }, AcademicYear);
+            await page.keyboard.press('Tab');
+        } catch (error) {
+            console.log("Error occurred while selecting Academic Year (retrying)");
+            // Academic Year select dropdown 
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+            await page.evaluate((AcademicYear) => {
+                const options = document.querySelectorAll(
+                    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop li'
+                );
+                for (let option of options) {
+                    if (option.innerText.trim() === AcademicYear) {
+                        option.scrollIntoView();
+                        option.click();
+                        break;
+                    }
+                }
+            }, AcademicYear);
+            await page.keyboard.press('Tab');
         }
 
         try {
-        // Claim Type (main section, evIter:31)
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // short delay for stability
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop',{ visible: true });
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop');
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop',{ visible: true });
-        await page.evaluate((ClaimType) => {
-        const options = document.querySelectorAll(
-            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop li'
-        );
-        for (let option of options) {
-            if (option.innerText.trim() === ClaimType) { // "Tuition", "Books", "Transport"
-            option.scrollIntoView();
-            option.click();
-            break;
-            }
-        }
-        }, ClaimType);
-        }catch(error){
-            if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')){
-                console.log("Error occurred while selecting Claim Type (retrying):", error);
-                // Claim Type (main section, evIter:31)
-                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // short delay for stability
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop',{ visible: true });
-                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop');
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop',{ visible: true });
-                await page.evaluate((ClaimType) => {
+            // Claim Type (main section, evIter:31)
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // short delay for stability
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+            await page.evaluate((ClaimType) => {
                 const options = document.querySelectorAll(
                     '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop li'
                 );
                 for (let option of options) {
                     if (option.innerText.trim() === ClaimType) { // "Tuition", "Books", "Transport"
-                    option.scrollIntoView();
-                    option.click();
-                    break;
+                        option.scrollIntoView();
+                        option.click();
+                        break;
                     }
                 }
-                }, ClaimType);
-
-            }else{
-                console.log("Error occurred while selecting Claim Type:", error);
-            }
-        }
-
-        if(SchoolFeeType !== '' || SchoolFeeType !== null || SchoolFeeType !== undefined){
-        try{
-        // School Fee Type (main section, evIter:32)
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop',{ visible: true });
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop');
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop',{ visible: true });
-        await page.evaluate((SchoolFeeType) => {
-        const options = document.querySelectorAll(
-            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop li'
-        );
-        for (let option of options) {
-            if (option.innerText.trim() === SchoolFeeType) { // e.g., "Monthly"
-            option.scrollIntoView();
-            option.click();
-            break;
-            }
-        }
-        }, SchoolFeeType);
-        }catch(error){
-            if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')){
-                console.log("Error occurred while selecting School Fee Type (retrying):", error);
-                // School Fee Type (main section, evIter:32)
-                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop',{ visible: true });
-                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop');
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop',{ visible: true });
-                await page.evaluate((SchoolFeeType) => {
+            }, ClaimType);
+        } catch (error) {
+            console.log("Error occurred while selecting Claim Type (retrying)");
+            // Claim Type (main section, evIter:31)
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // short delay for stability
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+            await page.evaluate((ClaimType) => {
                 const options = document.querySelectorAll(
-                    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop li'
+                    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop li'
                 );
                 for (let option of options) {
-                    if (option.innerText.trim() === SchoolFeeType) { // e.g., "Monthly"
-                    option.scrollIntoView();
-                    option.click();
-                    break;
+                    if (option.innerText.trim() === ClaimType) { // "Tuition", "Books", "Transport"
+                        option.scrollIntoView();
+                        option.click();
+                        break;
                     }
                 }
-                }, SchoolFeeType);
-            }else{
-                console.log("Error occurred while selecting School Fee Type:", error);
-            }
+            }, ClaimType);
         }
+
+        if (SchoolFeeType !== '' || SchoolFeeType !== null || SchoolFeeType !== undefined) {
+            try {
+                // School Fee Type (main section, evIter:32)
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop');
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((SchoolFeeType) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === SchoolFeeType) { // e.g., "Monthly"
+                            option.scrollIntoView();
+                            option.click();
+                            break;
+                        }
+                    }
+                }, SchoolFeeType);
+            } catch (error) {
+                console.log("Error occurred while selecting School Fee Type (retrying)");
+                // School Fee Type (main section, evIter:32)
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:drop');
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((SchoolFeeType) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === SchoolFeeType) { // e.g., "Monthly"
+                            option.scrollIntoView();
+                            option.click();
+                            break;
+                        }
+                    }
+                }, SchoolFeeType);
+            }
         }
 
         // -------- From Date --------
@@ -450,74 +421,69 @@ async function UAESchoolSupportProgram(browser, page, body, res) {
         // Delay 
         await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
 
-        try{
-        // -------- Child --------
-        const inputSelectorChildMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:content"]';
-        await page.waitForSelector(inputSelectorChildMain, { visible: true });
-        await page.click(inputSelectorChildMain, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelectorChildMain, Child); // e.g. "2"
+        try {
+            // -------- Child --------
+            const inputSelectorChildMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:content"]';
+            await page.waitForSelector(inputSelectorChildMain, { visible: true });
+            await page.click(inputSelectorChildMain, { clickCount: 3 });
+            await page.keyboard.press('Backspace');
+            await page.type(inputSelectorChildMain, Child); // e.g. "2"
 
-        // Wait for the suggestions to appear
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
-        const childFound = await page.evaluate((selector, childName) => {
-        const items = document.querySelectorAll(selector);
-        for (let item of items) {
-            if (item.innerText.trim() === childName) {
-            item.click();
-            return true; // Found and clicked
-            }
-            if (item.innerText.trim().toLowerCase() === "No results found.".toLowerCase()) {
-            return false;
-            }
-        }
-        return false; // Not found
-        }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
-        if (!childFound) {
-        throw new Error("No child exist with this provided name: " + Child);
-        }
-        }catch(error){
-            if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element')){
-                console.log("Retrying selecting Child:", error);
-                // -------- Child --------
-                const inputSelectorChildMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:content"]';
-                await page.waitForSelector(inputSelectorChildMain, { visible: true });
-                await page.click(inputSelectorChildMain, { clickCount: 3 });
-                await page.keyboard.press('Backspace');
-                await page.type(inputSelectorChildMain, Child); // e.g. "2"
-
-                // Wait for the suggestions to appear
-                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
-                const childFound = await page.evaluate((selector, childName) => {
+            // Wait for the suggestions to appear
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
+            const childFound = await page.evaluate((selector, childName) => {
                 const items = document.querySelectorAll(selector);
                 for (let item of items) {
                     if (item.innerText.trim() === childName) {
-                    item.click();
-                    return true; // Found and clicked
+                        item.click();
+                        return true; // Found and clicked
                     }
                     if (item.innerText.trim().toLowerCase() === "No results found.".toLowerCase()) {
-                    return false;
+                        return false;
                     }
                 }
                 return false; // Not found
-                }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
-                if (!childFound) {
-                throw new Error("No child exist with this provided name: " + Child);
+            }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
+        } catch (error) {
+            console.log("Retrying selecting Child:", error);
+            // -------- Child --------
+            const inputSelectorChildMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:content"]';
+            await page.waitForSelector(inputSelectorChildMain, { visible: true });
+            await page.click(inputSelectorChildMain, { clickCount: 3 });
+            await page.keyboard.press('Backspace');
+            await page.type(inputSelectorChildMain, Child); // e.g. "2"
+
+            // Wait for the suggestions to appear
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
+            const childFound = await page.evaluate((selector, childName) => {
+                const items = document.querySelectorAll(selector);
+                for (let item of items) {
+                    if (item.innerText.trim() === childName) {
+                        item.click();
+                        return true; // Found and clicked
+                    }
+                    if (item.innerText.trim().toLowerCase() === "No results found.".toLowerCase()) {
+                        return false;
+                    }
                 }
-            }else{
-                console.log("Error occurred while selecting Child:", error);
+                return false; // Not found
+            }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
+            if (!childFound) {
+                throw new AutomationError('No child exist with this provided name: ' + Child, plan, personNumber, RequestID);
             }
         }
     }
-    
+
     //Wait for error popup
-    try{
+    try {
         await page.waitForSelector('#DhtmlZOrderManagerLayerContainer #_FOd1\\:\\:popup-container', { visible: true, timeout: 3000 });
-        errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span',(el) => el.textContent.trim());
+        errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span', (el) => el.textContent.trim());
         await page.click('#_FOd1\\:\\:msgDlg\\:\\:cancel');
-        await browser.close();
-        return res.status(400).json({ success:false,error: errorMessage });
+        throw new AutomationError(errorMessage, plan, personNumber, RequestID);
     } catch (error) {
+        if (error instanceof AutomationError) {
+            throw new AutomationError(error.message, error.plan, error.personNumber, error.RequestID);
+        }
         console.log('No error message displayed, proceeding with the request.');
     }
 }

@@ -54,6 +54,7 @@ const navigateToIndividualCompensation = async (page, personNumber) => {
             page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:pt1\\:Perso1\\:0\\:SP3\\:table1\\:am2\\:dc_i1\\:2\\:dci1\\:1\\:dccmi1')
         ]);
     }
+    console.log('Navigated to Individual Compensation page');
 };
 
 module.exports = navigateToIndividualCompensation;

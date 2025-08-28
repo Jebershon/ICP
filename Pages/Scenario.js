@@ -1,4 +1,10 @@
-async function Scenario(res,body,page, browser, username, password,url, Login, PersonManagement, awardCompensation,
+const AutomationError = require('../Utils/CustomError');
+
+async function Scenario(res, body, page, browser, username, password, url,
+    Login,
+    PersonManagement,
+    awardCompensation,
+    HandleResponse,
     INDCommunicationAllowance,
     INDOvertimeRequest,
     KSABuisnessTripRequest,
@@ -10,99 +16,106 @@ async function Scenario(res,body,page, browser, username, password,url, Login, P
     UAEOvertimeRequest,
     UAESchoolSupportProgram,
 ) {
-        // Person Number is required for the automation
-        const { personNumber } = body;
+    // Person Number is required for the automation
+    const { personNumber, plan, RequestID } = body;
 
-        if (!personNumber) {
-            await browser.close();
-            return res.status(400).json({ success: false, error: 'Person Number is Missing!' });
-        }
+    console.log(`Starting automation for Person Number: ${personNumber}, Plan: ${plan}, RequestID: ${RequestID}`);
 
-        //Login to Oracle Fusion
-        await Login(page, url, username, password);
+    const missingFields = [];
+    if (!personNumber) missingFields.push('Person Number');
+    if (!plan) missingFields.push('Plan');
+    if (!RequestID) missingFields.push('RequestID');
+    if (missingFields.length > 0) {
+        await browser.close();
+        throw new AutomationError(`Missing ${missingFields.join(', ')}!`, plan, personNumber, RequestID);
+    }
 
-        // Navigate to Person Management page
-        await PersonManagement(page, personNumber);
+    //Login to Oracle Fusion
+    await Login(page, url, username, password);
 
-        // Award Compensation
-        await awardCompensation(
-            page,            
-            browser,
-            body,
-            res,
-            INDCommunicationAllowance,
-            INDOvertimeRequest,
-            KSABuisnessTripRequest,
-            KSACommunicationAllowance,
-            KSAOvertimeRequest,
-            KSASchoolSupportProgram,
-            UAEBusinessTripRequest,
-            UAECommunicationAllowance,
-            UAEOvertimeRequest,
-            UAESchoolSupportProgram
-        );
+    // Navigate to Person Management page
+    await PersonManagement(page, personNumber);
 
-        //Delay
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+    // Award Compensation
+    await awardCompensation(
+        page,
+        browser,
+        body,
+        res, plan, personNumber, RequestID,
+        HandleResponse,
+        INDCommunicationAllowance,
+        INDOvertimeRequest,
+        KSABuisnessTripRequest,
+        KSACommunicationAllowance,
+        KSAOvertimeRequest,
+        KSASchoolSupportProgram,
+        UAEBusinessTripRequest,
+        UAECommunicationAllowance,
+        UAEOvertimeRequest,
+        UAESchoolSupportProgram
+    );
 
-        //Continue
-        await page.waitForFunction(() => {
-            const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
-            return buttons.some(btn => btn.innerText.replace(/\s+/g, '').includes('Continue'));
-        });
+    //Delay
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
 
-        await page.evaluate(() => {
-            const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
-            for (let btn of buttons) {
-                if (btn.innerText.replace(/\s+/g, '').includes('Continue')) {
-                    btn.focus();
-                    btn.click();
-                    break;
-                }
-            }
-        });
+    //Continue
+    await page.waitForFunction(() => {
+        const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
+        return buttons.some(btn => btn.innerText.replace(/\s+/g, '').includes('Continue'));
+    });
 
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
-        
-        //submit
-        await page.waitForFunction(() => {
-            const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
-            return buttons.some(btn => btn.innerText.replace(/\s+/g, '').includes('Submit'));
-        });
-        await page.evaluate(() => {
-            const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
-            for (let btn of buttons) {
-                if (btn.innerText.replace(/\s+/g, '').includes('Submit')) {
-                    btn.focus();
-                    btn.click();
-                    break;
-                }
-            }
-        });
-        
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
-        
-        // Wait for the warning
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okWarningDialog');
-        await page.evaluate(() => {
-            const btn = document.querySelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okWarningDialog');
-            if (btn) {
+    await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
+        for (let btn of buttons) {
+            if (btn.innerText.replace(/\s+/g, '').includes('Continue')) {
                 btn.focus();
                 btn.click();
+                break;
             }
-        });
+        }
+    });
 
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
-        
-        //final ok button
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okConfirmationDialog');
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okConfirmationDialog');
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
 
-        
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
-        
-        // Close the browser
-        await browser.close();
+    //submit
+    await page.waitForFunction(() => {
+        const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
+        return buttons.some(btn => btn.innerText.replace(/\s+/g, '').includes('Submit'));
+    });
+    await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('a[role="button"]'));
+        for (let btn of buttons) {
+            if (btn.innerText.replace(/\s+/g, '').includes('Submit')) {
+                btn.focus();
+                btn.click();
+                break;
+            }
+        }
+    });
+
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+
+    // Wait for the warning
+    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okWarningDialog');
+    await page.evaluate(() => {
+        const btn = document.querySelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okWarningDialog');
+        if (btn) {
+            btn.focus();
+            btn.click();
+        }
+    });
+
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+
+    //final ok button
+    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okConfirmationDialog');
+    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okConfirmationDialog');
+
+
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+
+    // Close the browser
+    await browser.close();
 }
 
 module.exports = Scenario;

@@ -1,4 +1,7 @@
-async function awardCompensation(page,browser,body, res,
+const AutomationError = require('../Utils/CustomError');
+
+async function awardCompensation(page,browser,body, res, plan, personNumber, RequestID,
+        HandleResponse,
         INDCommunicationAllowance,
         INDOvertimeRequest,
         KSABusinessTripRequest,
@@ -9,31 +12,19 @@ async function awardCompensation(page,browser,body, res,
         UAECommunicationAllowance,
         UAEOvertimeRequest,
         UAESchoolSupportProgram) {
-
-    // Destructure required fields from req.body
-    const { plan } = body;
-
-    // Validate required fields
-    if (!plan) {
-        await browser.close();
-        return res.status(400).json({ success: false, error: 'Plan is Missing!' });
-    }
-    
     try{
-    await page.$eval(
-    '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:commandToolbarButton1 a',
-    el => el.click()
-    );
-    }
-    catch(error){
+        await page.$eval(
+        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:commandToolbarButton1 a',
+        el => el.click()
+        );
+    } catch(error){
         await page.waitForSelector('tr.p_AFReadOnly td.x51');
         // Extract the messages
         const messages = await page.evaluate(() => {
         const elements = document.querySelectorAll('tr.p_AFReadOnly td.x51');
         return Array.from(elements).map(el => el.innerText.trim()).filter(Boolean);
         });
-        await browser.close();
-        return res.status(400).json({ success: false, error: 'Warning - Individual Compensation: ' + messages.join(', ') });
+        throw new AutomationError(`Warning : ${messages.join(', ')}`, plan, personNumber, RequestID);
     }
 
     try{
@@ -51,71 +42,66 @@ async function awardCompensation(page,browser,body, res,
 
     //Call function based on plan name
     if (plan === 'IND Communication Allowance') { 
-        await INDCommunicationAllowance(browser, page, body, res);
+        await INDCommunicationAllowance(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }
     else if (plan === 'IND Overtime Request') { 
-        await INDOvertimeRequest(browser, page, body, res);
+        await INDOvertimeRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }
     else if (plan === 'KSA Business Trip Request') { 
-        await KSABusinessTripRequest(browser, page, body, res);
+        await KSABusinessTripRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }
     else if (plan === 'KSA Communication allowance') { 
-        await KSACommunicationAllowance(browser, page, body, res);
+        await KSACommunicationAllowance(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }  
     else if (plan === 'KSA Overtime Request') { 
-        await KSAOvertimeRequest(browser, page, body, res);
+        await KSAOvertimeRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }
     else if (plan === 'KSA School Support Program') { 
-        await KSASchoolSupportProgram(browser, page, body, res);
+        await KSASchoolSupportProgram(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }   
     else if (plan === 'UAE Business Trip Request') {
-        await UAEBusinessTripRequest(browser, page, body, res);
+        await UAEBusinessTripRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }
     else if (plan === 'UAE Communication Allowance') {
-        await UAECommunicationAllowance(browser, page, body, res);
+        await UAECommunicationAllowance(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }
     else if (plan === 'UAE Overtime Request') {
-        await UAEOvertimeRequest(browser, page, body, res);
+        await UAEOvertimeRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }
     else if (plan === 'UAE School Support Program') {
-        await UAESchoolSupportProgram(browser, page, body, res);
+        await UAESchoolSupportProgram(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }
     else {
-        await browser.close();
-        return res.status(400).json({ success: false, error: 'Invalid plan name' });
+        throw new AutomationError('Invalid plan name: ' + plan, plan, personNumber, RequestID);
     }
-
-    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+    console.log('Form filled for plan:', plan);
+    
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
 
    // Submit request button
     const submitButtonSelector = '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:d2\\:\\:ok';
     await page.waitForSelector(submitButtonSelector, { visible: true });
     await page.click(submitButtonSelector);
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
-
-    //Wait for error popup
-    const errorSelector = '[id*="msgDlg"] [class*="x1mu"]';
-    for (let i = 0; i < 3; i++) {
-    try {
-        await page.waitForSelector(errorSelector, { visible: true, timeout: 2000 });
-        const errorText = await page.$eval(errorSelector, el => el.innerText.trim());
-        await browser.close();
-        return res.status(400).json({ success: false, error: errorText });
-    } catch (e) {
-        await new Promise(r => setTimeout(r, 1000));
-        console.log('attempting to find error message : ' + i);
-    }
-    }
     
-    // Wait for the confirmation message
-    try{
-        await page.waitForSelector('#DhtmlZOrderManagerLayerContainer #_FOd1\\:\\:popup-container', { visible: true, timeout: 3000 });
-        errorMessage = await page.$eval('#_FOd1\\:\\:msgDlg\\:\\:_ccntr .x1mu span',(el) => el.textContent.trim());
-        await page.click('#_FOd1\\:\\:msgDlg\\:\\:cancel');
-        browser.close();
-        return res.status(400).json({ success: false, error: errorMessage });
+    try {
+        await page.waitForSelector('[id*="popup-container"] [id*="msgDlg"] .x1mu span', { timeout: 5000 });
+        const errorMessage = await page.$eval(
+            '[id*="popup-container"] [id*="msgDlg"] .x1mu span',
+            el => el.textContent.trim()
+        );
+        console.log("❌ Error popup detected:", errorMessage);
+        throw new AutomationError(errorMessage, plan, personNumber, RequestID);
     } catch (error) {
-        console.log('No error message displayed, proceeding with the request.');
+        if (error instanceof AutomationError) {
+            throw new AutomationError(error.message, error.plan, error.personNumber, error.RequestID);
+        }
+        console.error("No Error popup detected");
     }
 }
 module.exports = awardCompensation;
+
+
+
+
+

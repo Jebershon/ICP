@@ -16,6 +16,8 @@ async function login(page, url, username, password) {
 
     await page.waitForSelector('#btnActive', { visible: true });
     await page.click('#btnActive');
+
+    console.log('Login submitted');
 }
 
 module.exports = login;
