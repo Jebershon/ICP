@@ -58,11 +58,7 @@ async function automateAction(req, res) {
             await browser.close();
             HandleResponse(plan, personNumber, RequestID, 'Success', 'Request has been Successfully Submitted in Oracle Fusion');
         } catch (error) {
-            if (error instanceof AutomationError) {
-                console.error("Custom AutomationError handled: " + error.message);
-                throw new AutomationError(error.plan, error.personNumber, error.RequestID, error.message);
-            }
-            try {
+            if (error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element') || error.message.includes('detached Frame') || error.message.includes('Cannot set headers after they are sent to the client')) {
                 await browser.deleteCookie(...(await browser.cookies()));
                 await page.close();
                 page = await browser.newPage();
@@ -81,16 +77,17 @@ async function automateAction(req, res) {
                 );
                 await browser.close();
                 HandleResponse(plan, personNumber, RequestID, 'Success', 'Request has been Successfully Submitted in Oracle Fusion');
-            } catch (error) {
+            }
+            else {
                 if (browser.isConnected()) {
                     await browser.close();
                 }
                 if (error instanceof AutomationError) {
                     console.error("Custom AutomationError handled: " + error.message);
-                    throw new AutomationError(error.plan, error.personNumber, error.RequestID, error.message);
+                    HandleResponse(error.plan, error.personNumber, error.RequestID, error.status, error.message);
                 } else {
                     console.error('Error occurred during automation: ' + error.message);
-                    throw new Error(plan, personNumber, RequestID, 'Automation failed : Please try Again!, ' + error.message);
+                    HandleResponse(plan, personNumber, RequestID, 'Failed', 'Automation failed : Please try Again!, ' + error.message);
                 }
             }
         }
