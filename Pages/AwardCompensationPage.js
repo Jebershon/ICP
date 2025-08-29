@@ -4,6 +4,7 @@ async function awardCompensation(page,browser,body, res, plan, personNumber, Req
         HandleResponse,
         INDCommunicationAllowance,
         INDOvertimeRequest,
+        INDBusinessTripRequest,
         KSABusinessTripRequest,
         KSACommunicationAllowance,
         KSAOvertimeRequest,
@@ -46,6 +47,9 @@ async function awardCompensation(page,browser,body, res, plan, personNumber, Req
     }
     else if (plan === 'IND Overtime Request') { 
         await INDOvertimeRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
+    }
+    else if (plan === 'IND Business Trip') {
+        await INDBusinessTripRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);
     }
     else if (plan === 'KSA Business Trip Request') { 
         await KSABusinessTripRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse);

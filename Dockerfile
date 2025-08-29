@@ -48,7 +48,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install puppeteer (downloads its matching Chromium)
-RUN npm install puppeteer
+RUN npx puppeteer browsers install chrome
 
 # Copy rest of app
 COPY . .

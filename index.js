@@ -13,6 +13,7 @@ const awardCompensation = require('./Pages/AwardCompensationPage');
 //importing the request types
 const INDCommunicationAllowance = require('./RequestTypes/IND Communication Allowance');
 const INDOvertimeRequest = require('./RequestTypes/IND Overtime Request');
+const INDBusinessTripRequest = require('./RequestTypes/IND Business Trip Request');
 const KSABuisnessTripRequest = require('./RequestTypes/KSA Business Trip Request');
 const KSACommunicationAllowance = require('./RequestTypes/KSA Communication allowance');
 const KSAOvertimeRequest = require('./RequestTypes/KSA Overtime Request');
@@ -53,6 +54,7 @@ async function automateAction(req, res) {
             await Scenario(res, req.body, page, browser, username, password, url, Login, PersonManagement, awardCompensation, HandleResponse,
                 INDCommunicationAllowance,
                 INDOvertimeRequest,
+                INDBusinessTripRequest,
                 KSABuisnessTripRequest,
                 KSACommunicationAllowance,
                 KSAOvertimeRequest,
@@ -73,6 +75,7 @@ async function automateAction(req, res) {
                 await Scenario(res, req.body, page, browser, username, password, url, Login, PersonManagement, awardCompensation, HandleResponse,
                     INDCommunicationAllowance,
                     INDOvertimeRequest,
+                    INDBusinessTripRequest,
                     KSABuisnessTripRequest,
                     KSACommunicationAllowance,
                     KSAOvertimeRequest,
