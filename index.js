@@ -39,7 +39,14 @@ const now = new Date();
 //Automate Function perform actions
 async function automateAction(req, res) {
     const { plan, personNumber, RequestID } = req.body;
-    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] }); // Set true if you don't want UI
+    const browser = await puppeteer.launch({ 
+        headless: true, 
+        args: [
+            '--no-sandbox', 
+            '--disable-setuid-sandbox', 
+            '--disable-dev-shm-usage', 
+            '--disable-gpu'] 
+    }); // Set true if you don't want UI
     let page = await browser.newPage();
     try {
         try {
