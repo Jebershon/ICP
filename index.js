@@ -37,33 +37,13 @@ const XApiKey = process.env.X_API_KEY;
 const now = new Date();
 
 //Automate Function perform actions
-async function automateAction(req,res) {
+async function automateAction(req, res) {
     const { plan, personNumber, RequestID } = req.body;
-    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']}); // Set true if you don't want UI
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] }); // Set true if you don't want UI
     let page = await browser.newPage();
     try {
         try {
-            await Scenario(res,req.body,page, browser, username, password,url, Login, PersonManagement, awardCompensation,HandleResponse,
-            INDCommunicationAllowance,
-            INDOvertimeRequest,
-            KSABuisnessTripRequest,
-            KSACommunicationAllowance,
-            KSAOvertimeRequest,
-            KSASchoolSupportProgram,
-            UAEBusinessTripRequest,
-            UAECommunicationAllowance,
-            UAEOvertimeRequest,
-            UAESchoolSupportProgram,
-            );
-            await browser.close();
-            HandleResponse(plan,personNumber,RequestID,'Success','Request has been Successfully Submitted in Oracle Fusion');
-        } catch (error) {
-            if(error.message.includes('Node is detached from document') || error.message.includes('Node is either not clickable or not an Element') || error.message.includes('detached Frame') || error.message.includes('Cannot set headers after they are sent to the client')){
-                await browser.deleteCookie(...(await browser.cookies()));
-                await page.close();
-                page = await browser.newPage();
-                console.error('Trying in new Browser page');
-                await Scenario(res,req.body,page, browser, username, password,url, Login, PersonManagement, awardCompensation,HandleResponse,
+            await Scenario(res, req.body, page, browser, username, password, url, Login, PersonManagement, awardCompensation, HandleResponse,
                 INDCommunicationAllowance,
                 INDOvertimeRequest,
                 KSABuisnessTripRequest,
@@ -74,44 +54,67 @@ async function automateAction(req,res) {
                 UAECommunicationAllowance,
                 UAEOvertimeRequest,
                 UAESchoolSupportProgram,
+            );
+            await browser.close();
+            HandleResponse(plan, personNumber, RequestID, 'Success', 'Request has been Successfully Submitted in Oracle Fusion');
+        } catch (error) {
+            if (error instanceof AutomationError) {
+                console.error("Custom AutomationError handled: " + error.message);
+                throw new AutomationError(error.plan, error.personNumber, error.RequestID, error.message);
+            }
+            try {
+                await browser.deleteCookie(...(await browser.cookies()));
+                await page.close();
+                page = await browser.newPage();
+                console.error('Trying in new Browser page');
+                await Scenario(res, req.body, page, browser, username, password, url, Login, PersonManagement, awardCompensation, HandleResponse,
+                    INDCommunicationAllowance,
+                    INDOvertimeRequest,
+                    KSABuisnessTripRequest,
+                    KSACommunicationAllowance,
+                    KSAOvertimeRequest,
+                    KSASchoolSupportProgram,
+                    UAEBusinessTripRequest,
+                    UAECommunicationAllowance,
+                    UAEOvertimeRequest,
+                    UAESchoolSupportProgram,
                 );
                 await browser.close();
-                HandleResponse(plan,personNumber,RequestID,'Success','Request has been Successfully Submitted in Oracle Fusion');
-            }
-            else{
-                if(browser.isConnected()){
+                HandleResponse(plan, personNumber, RequestID, 'Success', 'Request has been Successfully Submitted in Oracle Fusion');
+            } catch (error) {
+                if (browser.isConnected()) {
                     await browser.close();
                 }
                 if (error instanceof AutomationError) {
-                    console.error("Custom AutomationError handled: "+error.message);
-                    HandleResponse(error.plan,error.personNumber,error.RequestID,error.status,error.message);
-                }else{
-                    console.error('Error occurred during automation: '+error.message);
-                    HandleResponse(plan,personNumber,RequestID,'Failed','Automation failed : Please try Again!, '+error.message);
+                    console.error("Custom AutomationError handled: " + error.message);
+                    throw new AutomationError(error.plan, error.personNumber, error.RequestID, error.message);
+                } else {
+                    console.error('Error occurred during automation: ' + error.message);
+                    throw new Error(plan, personNumber, RequestID, 'Automation failed : Please try Again!, ' + error.message);
                 }
             }
         }
     }
-    catch(error){
-        if(browser.isConnected()){
+    catch (error) {
+        if (browser.isConnected()) {
             await browser.close();
         }
         if (error instanceof AutomationError) {
-            console.error("Custom AutomationError handled: "+error.message);
-            HandleResponse(error.plan,error.personNumber,error.RequestID,error.status,error.message);
-        }else{
-            console.error('Error occurred during automation : '+error.message);
-            HandleResponse(plan,personNumber,RequestID,'Failed','Automation failed : Please try Again!, '+error.message);
+            console.error("Custom AutomationError handled: " + error.message);
+            HandleResponse(error.plan, error.personNumber, error.RequestID, error.status, error.message);
+        } else {
+            console.error('Error occurred during automation : ' + error.message);
+            HandleResponse(plan, personNumber, RequestID, 'Failed', 'Automation failed : Please try Again!, ' + error.message);
         }
-    }finally {
-        if(browser.isConnected()){
-        await browser.close();
+    } finally {
+        if (browser.isConnected()) {
+            await browser.close();
         }
     }
 }
 
 //Mendix post API Handling
-function HandleResponse(Plan,EmployeeID,RequestID,Status,Message){
+function HandleResponse(Plan, EmployeeID, RequestID, Status, Message) {
     const payload = {
         Plan: String(Plan),
         EmployeeID: String(EmployeeID),
@@ -122,10 +125,10 @@ function HandleResponse(Plan,EmployeeID,RequestID,Status,Message){
     };
     console.log('payload:', JSON.stringify(payload, null, 2));
     const config = {
-    headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-    }
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        }
     };
     if (XApiKey) {
         config.headers['x-api-key'] = XApiKey;
@@ -133,12 +136,12 @@ function HandleResponse(Plan,EmployeeID,RequestID,Status,Message){
 
     axios.post(MendixEndpoint, payload, config)
         .then(response => {
-            if(response.status === 200) {
+            if (response.status === 200) {
                 console.log('Success:', response.data);
             }
         })
         .catch(error => {
-           if (error.response) {
+            if (error.response) {
                 console.error("Mendix Error:", error.response.status, error.response.data);
             } else {
                 console.error("Error sending data to Mendix:", error.message);
