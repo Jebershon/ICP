@@ -41,13 +41,12 @@ const now = new Date();
 async function automateAction(req, res) {
     const { plan, personNumber, RequestID } = req.body;
     const browser = await puppeteer.launch({ 
-        headless: false, 
+        headless: true, 
         args: [
             '--no-sandbox', 
             '--disable-setuid-sandbox', 
             '--disable-dev-shm-usage', 
-            '--disable-gpu'],
-        timeout: 60000
+            '--disable-gpu']
     }); // Set true if you don't want UI
     let page = await browser.newPage();
     try {

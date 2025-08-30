@@ -88,6 +88,23 @@ async function awardCompensation(page,browser,body, res, plan, personNumber, Req
     await page.click(submitButtonSelector);
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
     
+    for (let i = 0; i < 5; i++) {
+    try {
+        await page.waitForSelector('[id*="msgDlg"] [class*="x1mu"]', { visible: true, timeout: 2000 });
+        const errorText = await page.$eval('[id*="msgDlg"] [class*="x1mu"]', el => el.innerText.trim());
+        if(errorText){
+            console.log("❌ Inline error detected:", errorText);
+            throw new AutomationError(errorText, plan, personNumber, RequestID);
+        }
+        console.log("❌ Inline error detected:", errorText);
+    } catch (e) {
+        if (e instanceof AutomationError) {
+            throw new AutomationError(e.message, e.plan, e.personNumber, e.RequestID);
+        }
+        console.log('attempting to find error message : ' + i);
+    }
+    }
+
     try {
         await page.waitForSelector('[id*="popup-container"] [id*="msgDlg"] .x1mu span', { timeout: 5000 });
         const errorMessage = await page.$eval(

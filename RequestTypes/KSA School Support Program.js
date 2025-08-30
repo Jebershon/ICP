@@ -240,14 +240,20 @@ async function KSASchoolSupportProgram(browser, page, body, res, plan, personNum
                 }
                 return false; // Not found
             }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
+            if (!childFound) {
+                throw new AutomationError('No child exist with this provided name: ' + Child, plan, personNumber, RequestID);
+            }
         } catch (error) {
+            if (error instanceof AutomationError) {
+                throw new AutomationError(error.message, error.plan, error.personNumber, error.RequestID);
+            }
             // -------- Child --------
             const inputSelectorChildMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:ValueSetScreenEntryValue1\\:\\:content"]';
             await page.waitForSelector(inputSelectorChildMain, { visible: true });
             await page.click(inputSelectorChildMain, { clickCount: 3 });
             await page.keyboard.press('Backspace');
             await page.type(inputSelectorChildMain, Child); // e.g. "2"
-
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
             // Wait for the suggestions to appear
             await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
             const childFound = await page.evaluate((selector, childName) => {
@@ -279,6 +285,7 @@ async function KSASchoolSupportProgram(browser, page, body, res, plan, personNum
             await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop', { visible: true });
             await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:drop');
             await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
             await page.evaluate((AcademicYear) => {
                 const options = document.querySelectorAll(
                     '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:lovScreenEntryValue\\:\\:pop li'
@@ -428,7 +435,7 @@ async function KSASchoolSupportProgram(browser, page, body, res, plan, personNum
             await page.click(inputSelectorChildMain, { clickCount: 3 });
             await page.keyboard.press('Backspace');
             await page.type(inputSelectorChildMain, Child); // e.g. "2"
-
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
             // Wait for the suggestions to appear
             await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
             const childFound = await page.evaluate((selector, childName) => {
@@ -444,14 +451,21 @@ async function KSASchoolSupportProgram(browser, page, body, res, plan, personNum
                 }
                 return false; // Not found
             }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
+            if (!childFound) {
+                throw new AutomationError('No child exist with this provided name: ' + Child, plan, personNumber, RequestID);
+            }
         } catch (error) {
+            if (error instanceof AutomationError) {
+                throw new AutomationError(error.message, error.plan, error.personNumber, error.RequestID);
+            }
+            console.error("retrying...| child selection");
             // -------- Child --------
             const inputSelectorChildMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:ValueSetScreenEntryValue1\\:\\:content"]';
             await page.waitForSelector(inputSelectorChildMain, { visible: true });
             await page.click(inputSelectorChildMain, { clickCount: 3 });
             await page.keyboard.press('Backspace');
             await page.type(inputSelectorChildMain, Child); // e.g. "2"
-
+            await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
             // Wait for the suggestions to appear
             await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
             const childFound = await page.evaluate((selector, childName) => {
