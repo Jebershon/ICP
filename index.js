@@ -6,6 +6,7 @@ const axios = require('axios');
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
+const envFilePath = path.resolve(__dirname, '.env');
 
 // Importing the pages
 const Scenario = require('./Pages/Scenario');
@@ -208,6 +209,41 @@ app.get("/kill-browsers", async (req, res) => {
     } catch (err) {
         console.error("Error killing browsers:", err.message);
         res.status(500).send("❌ Failed to kill browsers");
+    }
+});
+
+app.post('/update-env', (req, res) => {
+    const updates = req.body; // Expecting { ICP_NODE_URL: "...", ICP_GCPUSERNAME: "...", ... }
+
+    if (!updates || typeof updates !== 'object') {
+        return res.status(400).json({ success: false, message: 'Invalid request body' });
+    }
+
+    let envContent = '';
+    try {
+        envContent = fs.readFileSync(envFilePath, 'utf-8');
+    } catch (err) {
+        console.error('Error reading .env file:', err);
+        return res.status(500).json({ success: false, message: 'Failed to read .env file' });
+    }
+
+    // Update or add keys
+    for (const [key, value] of Object.entries(updates)) {
+        const regex = new RegExp(`^${key}=.*$`, 'm');
+
+        if (envContent.match(regex)) {
+            envContent = envContent.replace(regex, `${key}=${value}`);
+        } else {
+            envContent += `\n${key}=${value}`;
+        }
+    }
+
+    try {
+        fs.writeFileSync(envFilePath, envContent, 'utf-8');
+        return res.status(200).json({ success: true, message: '.env updated successfully' });
+    } catch (err) {
+        console.error('Error writing .env file:', err);
+        return res.status(500).json({ success: false, message: 'Failed to write .env file' });
     }
 });
 
