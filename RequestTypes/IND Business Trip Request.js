@@ -1,7 +1,7 @@
 const AutomationError = require("../Utils/CustomError");
 
 function exists(value) {
-    return value !== null && value !== undefined;
+    return value !== null && value !== undefined && value !== '';
 }
 
 async function KSABusinessTripRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse) {

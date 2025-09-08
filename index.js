@@ -3,6 +3,9 @@ const express = require('express');
 const puppeteer = require('puppeteer');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const fs = require("fs");
+const path = require("path");
+const { execSync } = require("child_process");
 
 // Importing the pages
 const Scenario = require('./Pages/Scenario');
@@ -37,17 +40,47 @@ const MendixEndpoint = process.env.MENDIX_ENDPOINT;
 const XApiKey = process.env.X_API_KEY;
 const now = new Date();
 
+//count browser
+function countBrowsers() {
+    const procDir = "/proc";
+    let count = 0;
+    try {
+        const pids = fs.readdirSync(procDir).filter(f => /^\d+$/.test(f)); // only numeric dirs (processes)
+        for (const pid of pids) {
+            try {
+                const commPath = path.join(procDir, pid, "comm");
+                const name = fs.readFileSync(commPath, "utf8").trim();
+                if (name.includes("chrome") || name.includes("chromium")) {
+                    count++;
+                }
+            } catch (e) {
+            }
+        }
+    } catch (err) {
+        console.error("Error scanning /proc:", err.message);
+    }
+    return count;
+}
+
+// Example: log every 5 seconds
+setInterval(() => {
+    console.log("Total browsers running:", countBrowsers());
+}, 10000);
+
+const activeBrowsers = new Set();
+
 //Automate Function perform actions
 async function automateAction(req, res) {
     const { plan, personNumber, RequestID } = req.body;
-    const browser = await puppeteer.launch({ 
-        headless: true, 
+    const browser = await puppeteer.launch({
+        headless: false,// Set true if you don't want UI
         args: [
-            '--no-sandbox', 
-            '--disable-setuid-sandbox', 
-            '--disable-dev-shm-usage', 
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
             '--disable-gpu']
-    }); // Set true if you don't want UI
+    }); 
+    activeBrowsers.add(browser);
     let page = await browser.newPage();
     try {
         try {
@@ -117,6 +150,14 @@ async function automateAction(req, res) {
         if (browser.isConnected()) {
             await browser.close();
         }
+        for (const browser of activeBrowsers) {
+            try {
+                await browser.close();
+            } catch (err) {
+                console.error('Unable to close the browser...');
+            }
+            activeBrowsers.delete(browser);
+        }
     }
 }
 
@@ -155,6 +196,20 @@ function HandleResponse(Plan, EmployeeID, RequestID, Status, Message) {
             }
         });
 }
+
+app.get('/', (req, res) => {
+    res.send("Welcome to the Automation API");
+});
+
+app.get("/kill-browsers", async (req, res) => {
+    try {
+        execSync("pkill -f chrome");   // kills chrome & chromium processes
+        res.send("✅ All Chrome/Chromium processes killed forcefully");
+    } catch (err) {
+        console.error("Error killing browsers:", err.message);
+        res.status(500).send("❌ Failed to kill browsers");
+    }
+});
 
 // Endpoint to automate login and perform actions
 app.post('/automate-login', async (req, res) => {

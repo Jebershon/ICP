@@ -1,7 +1,7 @@
 const AutomationError = require("../Utils/CustomError");
 
 function exists(value) {
-    return value !== null && value !== undefined;
+    return value !== null && value !== undefined && value !== '';
 }
 
 async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse) {
@@ -9,6 +9,7 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
     const {
         option,
         PurposeofTravel,
+
         TripLocation1,
         StartDate1,
         EndDate1,
@@ -22,6 +23,7 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
         HotelBooking1,
         HotelPrice1,
         PerDiem1,
+
         TripLocation2,
         StartDate2,
         EndDate2,
@@ -35,6 +37,7 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
         HotelBooking2,
         HotelPrice2,
         PerDiem2,
+
         TripLocation3,
         StartDate3,
         EndDate3,
@@ -48,6 +51,7 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
         HotelBooking3,
         HotelPrice3,
         PerDiem3,
+
         TripLocation4,
         StartDate4,
         EndDate4,
@@ -61,9 +65,6 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
         HotelBooking4,
         HotelPrice4,
         PerDiem4,
-        TotalPerDiem,
-        TotalHotelPrice,
-        PayValue
     } = body;
 
     // Validate required fields individually and return specific error
@@ -75,7 +76,9 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
         EndDate1,
         LeavingFrom1,
         Goingto1,
-        FlightDuration1
+        FlightDuration1,
+        TicketRequired1,
+        HotelBooking1
     };
 
     console.log('validating fields of :' + plan);
@@ -287,27 +290,14 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
             }, TicketRequired1);
         }
 
-        // Departure Time1
-        const inputSelector5 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:10\\:screenEntryValueDate\\:\\:content"]';
-        await page.waitForSelector(inputSelector5, { visible: true });
-        await page.click(inputSelector5, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector5, DepartureTime1); // Replace DepartureTime1 with your actual value (e.g., '2:30 PM')
-
-        // Duration in Days1
-        const inputSelector6 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:11\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelector6, { visible: true });
-        await page.click(inputSelector6, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector6, DurationInDays1); // Replace DurationInDays1 with your actual value
-
-        // Ticket Class1
-        const inputSelector7 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:12\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelector7, { visible: true });
-        await page.click(inputSelector7, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector7, TicketClass1);
-        await page.keyboard.press('Tab');
+        if (exists(DepartureTime1)) {
+            // Departure Time1
+            const inputSelector5 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:10\\:screenEntryValueDate\\:\\:content"]';
+            await page.waitForSelector(inputSelector5, { visible: true });
+            await page.click(inputSelector5, { clickCount: 3 });
+            await page.keyboard.press('Backspace');
+            await page.type(inputSelector5, DepartureTime1); // Replace DepartureTime1 with your actual value (e.g., '2:30 PM')
+        }
 
         try {
             //Hotel Booking1
@@ -350,25 +340,9 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
             }, HotelBooking1); // Replace PaymentMethod with a string like "Cash"
         }
 
-        // Hotel Price1
-        const inputSelector8 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:14\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelector8, { visible: true });
-        await page.click(inputSelector8, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector8, HotelPrice1);
-        await page.keyboard.press('Tab');
-
-        // Per Diem1
-        const inputSelector9 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:16\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelector9, { visible: true });
-        await page.click(inputSelector9, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector9, PerDiem1); // Replace FieldValue16 with your actual value
-        await page.keyboard.press('Tab');
-
     } catch (error) {
         console.log("Retrying ..|Error filling Trip 1 fields");
-                // Purpose of Travel
+        // Purpose of Travel
         const screenEntrySelector = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:2\\:screenEntryValue\\:\\:content"]';
         await page.waitForSelector(screenEntrySelector, { visible: true });
         await page.click(screenEntrySelector, { clickCount: 3 });
@@ -526,27 +500,14 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
             }, TicketRequired1);
         }
 
-        // Departure Time1
-        const inputSelector5 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:10\\:screenEntryValueDate\\:\\:content"]';
-        await page.waitForSelector(inputSelector5, { visible: true });
-        await page.click(inputSelector5, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector5, DepartureTime1); // Replace DepartureTime1 with your actual value (e.g., '2:30 PM')
-
-        // Duration in Days1
-        const inputSelector6 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:11\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelector6, { visible: true });
-        await page.click(inputSelector6, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector6, DurationInDays1); // Replace DurationInDays1 with your actual value
-
-        // Ticket Class1
-        const inputSelector7 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:12\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelector7, { visible: true });
-        await page.click(inputSelector7, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector7, TicketClass1);
-        await page.keyboard.press('Tab');
+        if (exists(DepartureTime1)) {
+            // Departure Time1
+            const inputSelector5 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:10\\:screenEntryValueDate\\:\\:content"]';
+            await page.waitForSelector(inputSelector5, { visible: true });
+            await page.click(inputSelector5, { clickCount: 3 });
+            await page.keyboard.press('Backspace');
+            await page.type(inputSelector5, DepartureTime1); // Replace DepartureTime1 with your actual value (e.g., '2:30 PM')
+        }
 
         try {
             //Hotel Booking1
@@ -588,22 +549,6 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                 }
             }, HotelBooking1); // Replace PaymentMethod with a string like "Cash"
         }
-
-        // Hotel Price1
-        const inputSelector8 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:14\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelector8, { visible: true });
-        await page.click(inputSelector8, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector8, HotelPrice1);
-        await page.keyboard.press('Tab');
-
-        // Per Diem1
-        const inputSelector9 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:16\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelector9, { visible: true });
-        await page.click(inputSelector9, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector9, PerDiem1); // Replace FieldValue16 with your actual value
-        await page.keyboard.press('Tab');
     }
 
     //TRIP 2(optional)
@@ -612,9 +557,7 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
     if (
         exists(TripLocation2) && exists(StartDate2) && exists(EndDate2) &&
         exists(LeavingFrom2) && exists(Goingto2) && exists(FlightDuration2) &&
-        exists(TicketRequired2) && exists(DepartureTime2) && exists(DurationInDays2) &&
-        exists(TicketClass2) && exists(HotelBooking2) && exists(HotelPrice2) &&
-        exists(PerDiem2)
+        exists(TicketRequired2) && exists(HotelBooking2)
     ) {
         try {
             try {
@@ -637,25 +580,25 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TripLocation2);
             } catch (error) {
-                    console.log("Retrying Travel Location selection...");
-                    //Travel location2
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TripLocation2) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:pop li'
-                        );
+                console.log("Retrying Travel Location selection...");
+                //Travel location2
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TripLocation2) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:pop li'
+                    );
 
-                        for (let option of options) {
-                            if (option.innerText.trim() === TripLocation2) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                    for (let option of options) {
+                        if (option.innerText.trim() === TripLocation2) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TripLocation2);
+                    }
+                }, TripLocation2);
             }
 
             // Start Date2
@@ -707,24 +650,24 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, FlightDuration2);
             } catch (error) {
-                    console.log('Retrying Flight Duration selection...');
-                    // Flight Duration2
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((DurationValue) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === DurationValue) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log('Retrying Flight Duration selection...');
+                // Flight Duration2
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((DurationValue) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === DurationValue) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, FlightDuration2);
+                    }
+                }, FlightDuration2);
             }
 
             try {
@@ -746,49 +689,35 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TicketRequired2);
             } catch (error) {
-                    console.log("Retrying Ticket Required2 selection...");
-                    // Ticket Required2
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TicketRequired2) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === TicketRequired2) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Ticket Required2 selection...");
+                // Ticket Required2
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TicketRequired2) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === TicketRequired2) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TicketRequired2);
+                    }
+                }, TicketRequired2);
             }
 
-            // Departure Time2
-            const inputSelectorDepartureTime2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:24\\:screenEntryValueDate\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDepartureTime2, { visible: true });
-            await page.click(inputSelectorDepartureTime2, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDepartureTime2, DepartureTime2); // e.g., '9:15 AM'
-            await page.keyboard.press('Tab');
-
-            // Duration in Days2
-            const inputSelectorDurationDays2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:25\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDurationDays2, { visible: true });
-            await page.click(inputSelectorDurationDays2, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDurationDays2, DurationInDays2); // Replace DurationInDays2 with your actual value
-            await page.keyboard.press('Tab');
-
-            // Ticket Class2
-            const inputSelectorTicketClass2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:26\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorTicketClass2, { visible: true });
-            await page.click(inputSelectorTicketClass2, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorTicketClass2, TicketClass2); // Replace TicketClass2 with your actual value
-            await page.keyboard.press('Tab');
+            if (exists(DepartureTime2)) {
+                // Departure Time2
+                const inputSelectorDepartureTime2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:24\\:screenEntryValueDate\\:\\:content"]';
+                await page.waitForSelector(inputSelectorDepartureTime2, { visible: true });
+                await page.click(inputSelectorDepartureTime2, { clickCount: 3 });
+                await page.keyboard.press('Backspace');
+                await page.type(inputSelectorDepartureTime2, DepartureTime2); // e.g., '9:15 AM'
+                await page.keyboard.press('Tab');
+            }
 
             try {
                 // Hotel Booking2
@@ -810,42 +739,26 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, HotelBooking2); // Example: "Cash" or "Agent Arrangement"
             } catch (error) {
-                    console.log("Retry selecting Hotel Booking2:", error);
-                    // Hotel Booking2
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    // Select desired option (e.g., "Cash", "Agent Arrangement")
-                    await page.evaluate((HotelBooking2) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === HotelBooking2) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retry selecting Hotel Booking2:", error);
+                // Hotel Booking2
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                // Select desired option (e.g., "Cash", "Agent Arrangement")
+                await page.evaluate((HotelBooking2) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === HotelBooking2) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, HotelBooking2); // Example: "Cash" or "Agent Arrangement"
+                    }
+                }, HotelBooking2); // Example: "Cash" or "Agent Arrangement"
             }
-
-            // Hotel Price2
-            const inputSelectorHotelPrice2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:28\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorHotelPrice2, { visible: true });
-            await page.click(inputSelectorHotelPrice2, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorHotelPrice2, HotelPrice2); // e.g., "800"
-            await page.keyboard.press('Tab');
-
-            // Per Diem2
-            const inputSelectorPerDiem2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorPerDiem2, { visible: true });
-            await page.click(inputSelectorPerDiem2, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorPerDiem2, PerDiem2); // e.g., "400"
-            await page.keyboard.press('Tab');
         } catch (error) {
             console.log("Error occurred while filling Trip 2 details:", error);
             try {
@@ -868,25 +781,25 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TripLocation2);
             } catch (error) {
-                    console.log("Retrying Travel Location selection...");
-                    //Travel location2
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TripLocation2) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:pop li'
-                        );
+                console.log("Retrying Travel Location selection...");
+                //Travel location2
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TripLocation2) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:17\\:lovScreenEntryValue\\:\\:pop li'
+                    );
 
-                        for (let option of options) {
-                            if (option.innerText.trim() === TripLocation2) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                    for (let option of options) {
+                        if (option.innerText.trim() === TripLocation2) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TripLocation2);
+                    }
+                }, TripLocation2);
             }
 
             // Start Date2
@@ -938,24 +851,24 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, FlightDuration2);
             } catch (error) {
-                    console.log('Retrying Flight Duration selection...');
-                    // Flight Duration2
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((DurationValue) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === DurationValue) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log('Retrying Flight Duration selection...');
+                // Flight Duration2
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((DurationValue) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:22\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === DurationValue) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, FlightDuration2);
+                    }
+                }, FlightDuration2);
             }
 
             try {
@@ -977,49 +890,35 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TicketRequired2);
             } catch (error) {
-                    console.log("Retrying Ticket Required2 selection...");
-                    // Ticket Required2
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TicketRequired2) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === TicketRequired2) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Ticket Required2 selection...");
+                // Ticket Required2
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TicketRequired2) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:23\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === TicketRequired2) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TicketRequired2);
+                    }
+                }, TicketRequired2);
             }
 
-            // Departure Time2
-            const inputSelectorDepartureTime2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:24\\:screenEntryValueDate\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDepartureTime2, { visible: true });
-            await page.click(inputSelectorDepartureTime2, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDepartureTime2, DepartureTime2); // e.g., '9:15 AM'
-            await page.keyboard.press('Tab');
-
-            // Duration in Days2
-            const inputSelectorDurationDays2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:25\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDurationDays2, { visible: true });
-            await page.click(inputSelectorDurationDays2, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDurationDays2, DurationInDays2); // Replace DurationInDays2 with your actual value
-            await page.keyboard.press('Tab');
-
-            // Ticket Class2
-            const inputSelectorTicketClass2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:26\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorTicketClass2, { visible: true });
-            await page.click(inputSelectorTicketClass2, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorTicketClass2, TicketClass2); // Replace TicketClass2 with your actual value
-            await page.keyboard.press('Tab');
+            if (exists(DepartureTime2)) {
+                // Departure Time2
+                const inputSelectorDepartureTime2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:24\\:screenEntryValueDate\\:\\:content"]';
+                await page.waitForSelector(inputSelectorDepartureTime2, { visible: true });
+                await page.click(inputSelectorDepartureTime2, { clickCount: 3 });
+                await page.keyboard.press('Backspace');
+                await page.type(inputSelectorDepartureTime2, DepartureTime2); // e.g., '9:15 AM'
+                await page.keyboard.press('Tab');
+            }
 
             try {
                 // Hotel Booking2
@@ -1041,42 +940,26 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, HotelBooking2); // Example: "Cash" or "Agent Arrangement"
             } catch (error) {
-                    console.log("Retry selecting Hotel Booking2:", error);
-                    // Hotel Booking2
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    // Select desired option (e.g., "Cash", "Agent Arrangement")
-                    await page.evaluate((HotelBooking2) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === HotelBooking2) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retry selecting Hotel Booking2:", error);
+                // Hotel Booking2
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                // Select desired option (e.g., "Cash", "Agent Arrangement")
+                await page.evaluate((HotelBooking2) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:27\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === HotelBooking2) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, HotelBooking2); // Example: "Cash" or "Agent Arrangement"
+                    }
+                }, HotelBooking2); // Example: "Cash" or "Agent Arrangement"
             }
-
-            // Hotel Price2
-            const inputSelectorHotelPrice2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:28\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorHotelPrice2, { visible: true });
-            await page.click(inputSelectorHotelPrice2, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorHotelPrice2, HotelPrice2); // e.g., "800"
-            await page.keyboard.press('Tab');
-
-            // Per Diem2
-            const inputSelectorPerDiem2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:30\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorPerDiem2, { visible: true });
-            await page.click(inputSelectorPerDiem2, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorPerDiem2, PerDiem2); // e.g., "400"
-            await page.keyboard.press('Tab');
         }
     }
 
@@ -1085,9 +968,7 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
     if (
         exists(TripLocation3) && exists(StartDate3) && exists(EndDate3) &&
         exists(LeavingFrom3) && exists(Goingto3) && exists(FlightDuration3) &&
-        exists(TicketRequired3) && exists(DepartureTime3) && exists(DurationInDays3) &&
-        exists(TicketClass3) && exists(HotelBooking3) && exists(HotelPrice3) &&
-        exists(PerDiem3)
+        exists(TicketRequired3) && exists(HotelBooking3)
     ) {
         try {
             try {
@@ -1109,25 +990,25 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TripLocation3); // e.g., "Middle East, Africa, the India"
             } catch (error) {
-                    console.log("Retrying Trip Location3 selection...");
-                    // Trip Location3
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TripLocation3) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === TripLocation3) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Trip Location3 selection...");
+                // Trip Location3
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TripLocation3) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === TripLocation3) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TripLocation3); // e.g., "Middle East, Africa, the India"
-                }
+                    }
+                }, TripLocation3); // e.g., "Middle East, Africa, the India"
+            }
 
             // Start Date3
             const inputSelectorStartDate3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:screenEntryValueDate\\:\\:content"]';
@@ -1180,24 +1061,24 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TicketRequired3); // Example values: "Yes" or "No"
             } catch (error) {
-                    console.log("Retrying Ticket Required3 selection...");
-                    // Ticket Required3
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TicketRequired3) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === TicketRequired3) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Ticket Required3 selection...");
+                // Ticket Required3
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TicketRequired3) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === TicketRequired3) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TicketRequired3); // Example values: "Yes" or "No"
+                    }
+                }, TicketRequired3); // Example values: "Yes" or "No"
             }
 
             try {
@@ -1219,49 +1100,35 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, FlightDuration3); // Pass a string like "Less Than 10 Hours" or "More Than 10 Hours"
             } catch (error) {
-                    console.log("Retrying Flight Duration3 selection...");
-                    // Flight Duration3
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((FlightDuration3) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === FlightDuration3) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Flight Duration3 selection...");
+                // Flight Duration3
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((FlightDuration3) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === FlightDuration3) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, FlightDuration3); // Pass a string like "Less Than 10 Hours" or "More Than 10 Hours"
-                }
+                    }
+                }, FlightDuration3); // Pass a string like "Less Than 10 Hours" or "More Than 10 Hours"
+            }
 
-            // Departure Time3
-            const inputSelectorDepartureTime3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:38\\:screenEntryValueDate\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDepartureTime3, { visible: true });
-            await page.click(inputSelectorDepartureTime3, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDepartureTime3, DepartureTime3); // e.g., "9:15 AM"
-            await page.keyboard.press('Tab');
-
-            // Duration in Days3
-            const inputSelectorDurationDays3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:39\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDurationDays3, { visible: true });
-            await page.click(inputSelectorDurationDays3, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDurationDays3, DurationInDays3); // e.g., "4"
-            await page.keyboard.press('Tab');
-
-            // Ticket Class3
-            const inputSelectorTicketClass3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:40\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorTicketClass3, { visible: true });
-            await page.click(inputSelectorTicketClass3, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorTicketClass3, TicketClass3); // e.g., "B1"
-            await page.keyboard.press('Tab');
+            if (exists(DepartureTime3)) {
+                // Departure Time3
+                const inputSelectorDepartureTime3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:38\\:screenEntryValueDate\\:\\:content"]';
+                await page.waitForSelector(inputSelectorDepartureTime3, { visible: true });
+                await page.click(inputSelectorDepartureTime3, { clickCount: 3 });
+                await page.keyboard.press('Backspace');
+                await page.type(inputSelectorDepartureTime3, DepartureTime3); // e.g., "9:15 AM"
+                await page.keyboard.press('Tab');
+            }
 
             try {
                 // Hotel Booking3
@@ -1283,42 +1150,26 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, HotelBooking3); // Example: "Agent Arrangement" or "Cash"
             } catch (error) {
-                    console.log("Retrying hotel booking selection...");
-                    // Hotel Booking3
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    // Select desired option (e.g., "Agent Arrangement" or "Cash")
-                    await page.evaluate((HotelBooking3) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === HotelBooking3) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying hotel booking selection...");
+                // Hotel Booking3
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                // Select desired option (e.g., "Agent Arrangement" or "Cash")
+                await page.evaluate((HotelBooking3) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === HotelBooking3) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, HotelBooking3); // Example: "Agent Arrangement" or "Cash"
+                    }
+                }, HotelBooking3); // Example: "Agent Arrangement" or "Cash"
             }
-
-            // Hotel Price3
-            const inputSelectorHotelPrice3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:43\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorHotelPrice3, { visible: true });
-            await page.click(inputSelectorHotelPrice3, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorHotelPrice3, HotelPrice3); // e.g., "900"
-            await page.keyboard.press('Tab');
-
-            // Per Diem3
-            const inputSelectorPerDiem3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:44\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorPerDiem3, { visible: true });
-            await page.click(inputSelectorPerDiem3, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorPerDiem3, PerDiem3); // e.g., "500"
-            await page.keyboard.press('Tab');
         } catch (error) {
             console.error('Retrying...|Error occurred while filling Trip 3 details:', error);
             try {
@@ -1340,25 +1191,25 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TripLocation3); // e.g., "Middle East, Africa, the India"
             } catch (error) {
-                    console.log("Retrying Trip Location3 selection...");
-                    // Trip Location3
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TripLocation3) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === TripLocation3) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Trip Location3 selection...");
+                // Trip Location3
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TripLocation3) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:31\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === TripLocation3) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TripLocation3); // e.g., "Middle East, Africa, the India"
-                }
+                    }
+                }, TripLocation3); // e.g., "Middle East, Africa, the India"
+            }
 
             // Start Date3
             const inputSelectorStartDate3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:32\\:screenEntryValueDate\\:\\:content"]';
@@ -1411,24 +1262,24 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TicketRequired3); // Example values: "Yes" or "No"
             } catch (error) {
-                    console.log("Retrying Ticket Required3 selection...");
-                    // Ticket Required3
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TicketRequired3) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === TicketRequired3) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Ticket Required3 selection...");
+                // Ticket Required3
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TicketRequired3) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:37\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === TicketRequired3) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TicketRequired3); // Example values: "Yes" or "No"
+                    }
+                }, TicketRequired3); // Example values: "Yes" or "No"
             }
 
             try {
@@ -1450,49 +1301,35 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, FlightDuration3); // Pass a string like "Less Than 10 Hours" or "More Than 10 Hours"
             } catch (error) {
-                    console.log("Retrying Flight Duration3 selection...");
-                    // Flight Duration3
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((FlightDuration3) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === FlightDuration3) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Flight Duration3 selection...");
+                // Flight Duration3
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((FlightDuration3) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === FlightDuration3) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, FlightDuration3); // Pass a string like "Less Than 10 Hours" or "More Than 10 Hours"
-                }
+                    }
+                }, FlightDuration3); // Pass a string like "Less Than 10 Hours" or "More Than 10 Hours"
+            }
 
-            // Departure Time3
-            const inputSelectorDepartureTime3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:38\\:screenEntryValueDate\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDepartureTime3, { visible: true });
-            await page.click(inputSelectorDepartureTime3, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDepartureTime3, DepartureTime3); // e.g., "9:15 AM"
-            await page.keyboard.press('Tab');
-
-            // Duration in Days3
-            const inputSelectorDurationDays3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:39\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDurationDays3, { visible: true });
-            await page.click(inputSelectorDurationDays3, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDurationDays3, DurationInDays3); // e.g., "4"
-            await page.keyboard.press('Tab');
-
-            // Ticket Class3
-            const inputSelectorTicketClass3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:40\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorTicketClass3, { visible: true });
-            await page.click(inputSelectorTicketClass3, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorTicketClass3, TicketClass3); // e.g., "B1"
-            await page.keyboard.press('Tab');
+            if (exists(DepartureTime3)) {
+                // Departure Time3
+                const inputSelectorDepartureTime3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:38\\:screenEntryValueDate\\:\\:content"]';
+                await page.waitForSelector(inputSelectorDepartureTime3, { visible: true });
+                await page.click(inputSelectorDepartureTime3, { clickCount: 3 });
+                await page.keyboard.press('Backspace');
+                await page.type(inputSelectorDepartureTime3, DepartureTime3); // e.g., "9:15 AM"
+                await page.keyboard.press('Tab');
+            }
 
             try {
                 // Hotel Booking3
@@ -1514,42 +1351,26 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, HotelBooking3); // Example: "Agent Arrangement" or "Cash"
             } catch (error) {
-                    console.log("Retrying hotel booking selection...");
-                    // Hotel Booking3
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    // Select desired option (e.g., "Agent Arrangement" or "Cash")
-                    await page.evaluate((HotelBooking3) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === HotelBooking3) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying hotel booking selection...");
+                // Hotel Booking3
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                // Select desired option (e.g., "Agent Arrangement" or "Cash")
+                await page.evaluate((HotelBooking3) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:41\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === HotelBooking3) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, HotelBooking3); // Example: "Agent Arrangement" or "Cash"
+                    }
+                }, HotelBooking3); // Example: "Agent Arrangement" or "Cash"
             }
-
-            // Hotel Price3
-            const inputSelectorHotelPrice3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:43\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorHotelPrice3, { visible: true });
-            await page.click(inputSelectorHotelPrice3, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorHotelPrice3, HotelPrice3); // e.g., "900"
-            await page.keyboard.press('Tab');
-
-            // Per Diem3
-            const inputSelectorPerDiem3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:44\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorPerDiem3, { visible: true });
-            await page.click(inputSelectorPerDiem3, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorPerDiem3, PerDiem3); // e.g., "500"
-            await page.keyboard.press('Tab');
         }
     }
     //TRIP 4(Optional)
@@ -1557,9 +1378,7 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
     if (
         exists(TripLocation4) && exists(StartDate4) && exists(EndDate4) &&
         exists(LeavingFrom4) && exists(Goingto4) && exists(FlightDuration4) &&
-        exists(TicketRequired4) && exists(DepartureTime4) && exists(DurationInDays4) &&
-        exists(TicketClass4) && exists(HotelBooking4) && exists(HotelPrice4) &&
-        exists(PerDiem4)
+        exists(TicketRequired4) && exists(HotelBooking4)
     ) {
         try {
             try {
@@ -1582,25 +1401,25 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TripLocation4); // e.g., "Middle East, Africa, the India"
             } catch (error) {
-                    console.log('Retrying Trip Location4 selection...');
-                    // Trip Location4
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TripLocation4) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:pop li'
-                        );
+                console.log('Retrying Trip Location4 selection...');
+                // Trip Location4
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TripLocation4) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:pop li'
+                    );
 
-                        for (let option of options) {
-                            if (option.innerText.trim() === TripLocation4) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                    for (let option of options) {
+                        if (option.innerText.trim() === TripLocation4) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TripLocation4); // e.g., "Middle East, Africa, the India"
+                    }
+                }, TripLocation4); // e.g., "Middle East, Africa, the India"
             }
 
             // Start Date4
@@ -1654,24 +1473,24 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, FlightDuration4); // Example: "Less Than 10 Hours" or "More Than 10 Hours"
             } catch (error) {
-                    console.log("Retrying Flight Duration4 selection...");
-                    // Flight Duration4
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((FlightDuration4) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === FlightDuration4) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Flight Duration4 selection...");
+                // Flight Duration4
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((FlightDuration4) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === FlightDuration4) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, FlightDuration4); // Example: "Less Than 10 Hours" or "More Than 10 Hours"
+                    }
+                }, FlightDuration4); // Example: "Less Than 10 Hours" or "More Than 10 Hours"
             }
 
             try {
@@ -1693,49 +1512,35 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TicketRequired4); // Example: "Yes" or "No"
             } catch (error) {
-                    console.log("Retrying Ticket Required4 selection...");
-                    // Ticket Required4
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TicketRequired4) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === TicketRequired4) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Ticket Required4 selection...");
+                // Ticket Required4
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TicketRequired4) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === TicketRequired4) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TicketRequired4); // Example: "Yes" or "No"
+                    }
+                }, TicketRequired4); // Example: "Yes" or "No"
             }
 
-            // Departure Time4
-            const inputSelectorDepartureTime4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:52\\:screenEntryValueDate\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDepartureTime4, { visible: true });
-            await page.click(inputSelectorDepartureTime4, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDepartureTime4, DepartureTime4); // e.g., "9:30 AM"
-            await page.keyboard.press('Tab');
-
-            // Duration in Days4
-            const inputSelectorDurationDays4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:53\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDurationDays4, { visible: true });
-            await page.click(inputSelectorDurationDays4, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDurationDays4, DurationInDays4); // e.g., "5"
-            await page.keyboard.press('Tab');
-
-            // Ticket Class4
-            const inputSelectorTicketClass4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:54\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorTicketClass4, { visible: true });
-            await page.click(inputSelectorTicketClass4, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorTicketClass4, TicketClass4); // e.g., "B1"
-            await page.keyboard.press('Tab');
+            if (exists(DepartureTime4)) {
+                // Departure Time4
+                const inputSelectorDepartureTime4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:52\\:screenEntryValueDate\\:\\:content"]';
+                await page.waitForSelector(inputSelectorDepartureTime4, { visible: true });
+                await page.click(inputSelectorDepartureTime4, { clickCount: 3 });
+                await page.keyboard.press('Backspace');
+                await page.type(inputSelectorDepartureTime4, DepartureTime4); // e.g., "9:30 AM"
+                await page.keyboard.press('Tab');
+            }
 
             try {
                 // Hotel Booking4
@@ -1756,42 +1561,25 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, HotelBooking4); // Example: "Agent Arrangement" or "Cash"
             } catch (error) {
-                    console.log("Retrying Hotel Booking4 selection...");
-                    // Hotel Booking4
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((HotelBooking4) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === HotelBooking4) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Hotel Booking4 selection...");
+                // Hotel Booking4
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((HotelBooking4) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === HotelBooking4) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, HotelBooking4); // Example: "Agent Arrangement" or "Cash"
+                    }
+                }, HotelBooking4); // Example: "Agent Arrangement" or "Cash"
             }
-
-            // Hotel Price4
-            const inputSelectorHotelPrice4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:56\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorHotelPrice4, { visible: true });
-            await page.click(inputSelectorHotelPrice4, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorHotelPrice4, HotelPrice4); // e.g., "900"
-            await page.keyboard.press('Tab');
-
-            // Per Diem4
-            const inputSelectorPerDiem4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:58\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorPerDiem4, { visible: true });
-            await page.click(inputSelectorPerDiem4, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorPerDiem4, PerDiem4); // e.g., "500"
-            await page.keyboard.press('Tab');
-
         } catch (error) {
             console.log("Retrying... |Error occurred while filling Trip 4 details: ", error);
             try {
@@ -1814,25 +1602,25 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TripLocation4); // e.g., "Middle East, Africa, the India"
             } catch (error) {
-                    console.log('Retrying Trip Location4 selection...');
-                    // Trip Location4
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TripLocation4) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:pop li'
-                        );
+                console.log('Retrying Trip Location4 selection...');
+                // Trip Location4
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TripLocation4) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:45\\:lovScreenEntryValue\\:\\:pop li'
+                    );
 
-                        for (let option of options) {
-                            if (option.innerText.trim() === TripLocation4) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                    for (let option of options) {
+                        if (option.innerText.trim() === TripLocation4) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TripLocation4); // e.g., "Middle East, Africa, the India"
+                    }
+                }, TripLocation4); // e.g., "Middle East, Africa, the India"
             }
 
             // Start Date4
@@ -1886,24 +1674,24 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, FlightDuration4); // Example: "Less Than 10 Hours" or "More Than 10 Hours"
             } catch (error) {
-                    console.log("Retrying Flight Duration4 selection...");
-                    // Flight Duration4
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((FlightDuration4) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === FlightDuration4) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Flight Duration4 selection...");
+                // Flight Duration4
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((FlightDuration4) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:50\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === FlightDuration4) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, FlightDuration4); // Example: "Less Than 10 Hours" or "More Than 10 Hours"
+                    }
+                }, FlightDuration4); // Example: "Less Than 10 Hours" or "More Than 10 Hours"
             }
 
             try {
@@ -1925,49 +1713,35 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, TicketRequired4); // Example: "Yes" or "No"
             } catch (error) {
-                    console.log("Retrying Ticket Required4 selection...");
-                    // Ticket Required4
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((TicketRequired4) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === TicketRequired4) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Ticket Required4 selection...");
+                // Ticket Required4
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((TicketRequired4) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:51\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === TicketRequired4) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, TicketRequired4); // Example: "Yes" or "No"
+                    }
+                }, TicketRequired4); // Example: "Yes" or "No"
             }
 
-            // Departure Time4
-            const inputSelectorDepartureTime4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:52\\:screenEntryValueDate\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDepartureTime4, { visible: true });
-            await page.click(inputSelectorDepartureTime4, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDepartureTime4, DepartureTime4); // e.g., "9:30 AM"
-            await page.keyboard.press('Tab');
-
-            // Duration in Days4
-            const inputSelectorDurationDays4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:53\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorDurationDays4, { visible: true });
-            await page.click(inputSelectorDurationDays4, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorDurationDays4, DurationInDays4); // e.g., "5"
-            await page.keyboard.press('Tab');
-
-            // Ticket Class4
-            const inputSelectorTicketClass4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:54\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorTicketClass4, { visible: true });
-            await page.click(inputSelectorTicketClass4, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorTicketClass4, TicketClass4); // e.g., "B1"
-            await page.keyboard.press('Tab');
+            if (exists(DepartureTime4)) {
+                // Departure Time4
+                const inputSelectorDepartureTime4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:52\\:screenEntryValueDate\\:\\:content"]';
+                await page.waitForSelector(inputSelectorDepartureTime4, { visible: true });
+                await page.click(inputSelectorDepartureTime4, { clickCount: 3 });
+                await page.keyboard.press('Backspace');
+                await page.type(inputSelectorDepartureTime4, DepartureTime4); // e.g., "9:30 AM"
+                await page.keyboard.press('Tab');
+            }
 
             try {
                 // Hotel Booking4
@@ -1988,72 +1762,26 @@ async function UAEBusinessTripRequest(browser, page, body, res, plan, personNumb
                     }
                 }, HotelBooking4); // Example: "Agent Arrangement" or "Cash"
             } catch (error) {
-                    console.log("Retrying Hotel Booking4 selection...");
-                    // Hotel Booking4
-                    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:drop', { visible: true });
-                    await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
-                    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:pop', { visible: true });
-                    await page.evaluate((HotelBooking4) => {
-                        const options = document.querySelectorAll(
-                            '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:pop li'
-                        );
-                        for (let option of options) {
-                            if (option.innerText.trim() === HotelBooking4) {
-                                option.scrollIntoView();
-                                option.click();
-                                break;
-                            }
+                console.log("Retrying Hotel Booking4 selection...");
+                // Hotel Booking4
+                await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:drop', { visible: true });
+                await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:drop', { clickCount: 1 });
+                await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:pop', { visible: true });
+                await page.evaluate((HotelBooking4) => {
+                    const options = document.querySelectorAll(
+                        '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:55\\:lovScreenEntryValue\\:\\:pop li'
+                    );
+                    for (let option of options) {
+                        if (option.innerText.trim() === HotelBooking4) {
+                            option.scrollIntoView();
+                            option.click();
+                            break;
                         }
-                    }, HotelBooking4); // Example: "Agent Arrangement" or "Cash"
+                    }
+                }, HotelBooking4); // Example: "Agent Arrangement" or "Cash"
             }
-
-            // Hotel Price4
-            const inputSelectorHotelPrice4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:56\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorHotelPrice4, { visible: true });
-            await page.click(inputSelectorHotelPrice4, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorHotelPrice4, HotelPrice4); // e.g., "900"
-            await page.keyboard.press('Tab');
-
-            // Per Diem4
-            const inputSelectorPerDiem4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:58\\:screenEntryValue\\:\\:content"]';
-            await page.waitForSelector(inputSelectorPerDiem4, { visible: true });
-            await page.click(inputSelectorPerDiem4, { clickCount: 3 });
-            await page.keyboard.press('Backspace');
-            await page.type(inputSelectorPerDiem4, PerDiem4); // e.g., "500"
-            await page.keyboard.press('Tab');
         }
-    }
-
-    if (exists(TotalPerDiem)) {
-        // Total Per Diem
-        const inputSelectorTotalPerDiem4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:59\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelectorTotalPerDiem4, { visible: true });
-        await page.click(inputSelectorTotalPerDiem4, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelectorTotalPerDiem4, TotalPerDiem); // e.g., "1500"
-        await page.keyboard.press('Tab');
-    }
-
-    if (exists(TotalHotelPrice)) {
-        // Total Hotel Price
-        const inputSelectorTotalHotelPrice4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:60\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelectorTotalHotelPrice4, { visible: true });
-        await page.click(inputSelectorTotalHotelPrice4, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelectorTotalHotelPrice4, TotalHotelPrice); // e.g., "2700"
-        await page.keyboard.press('Tab');
-    }
-
-    if (exists(PayValue)) {
-        // Pay Value
-        const inputSelectorPayValue4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:70\\:screenEntryValueNumber\\:\\:content"]';
-        await page.waitForSelector(inputSelectorPayValue4, { visible: true });
-        await page.click(inputSelectorPayValue4, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelectorPayValue4, PayValue); // e.g., "4200"
-        await page.keyboard.press('Tab');
     }
 }
 module.exports = UAEBusinessTripRequest;

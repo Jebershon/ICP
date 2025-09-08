@@ -1,6 +1,10 @@
 const { error } = require("winston");
 const AutomationError = require("../Utils/CustomError");
 
+function exists(value) {
+    return value !== null && value !== undefined && value !== '';
+}
+
 async function UAESchoolSupportProgram(browser, page, body, res, plan, personNumber, RequestID, HandleResponse) {
     // Destructure required fields from req.body
     const {
@@ -149,7 +153,7 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
             }, ClaimType);
         }
 
-        if (SchoolFeeType !== '' || SchoolFeeType !== null || SchoolFeeType !== undefined) {
+        if (exists(SchoolFeeType)) {
             try {
                 // School Fee Type (main section, evIter:32)
                 await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability
@@ -359,7 +363,7 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
             }, ClaimType);
         }
 
-        if (SchoolFeeType !== '' || SchoolFeeType !== null || SchoolFeeType !== undefined) {
+        if (exists(SchoolFeeType)) {
             try {
                 // School Fee Type (main section, evIter:32)
                 await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability

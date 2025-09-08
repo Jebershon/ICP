@@ -1,6 +1,10 @@
 const { error } = require("winston");
 const AutomationError = require("../Utils/CustomError");
 
+function exists(value) {
+    return value !== null && value !== undefined && value !== '';
+}
+
 async function KSASchoolSupportProgram(browser, page, body, res, plan, personNumber, RequestID, HandleResponse) {
     const {
         option,
@@ -147,7 +151,7 @@ async function KSASchoolSupportProgram(browser, page, body, res, plan, personNum
             }, ClaimType);
         }
 
-        if (SchoolFeeType !== '' || SchoolFeeType !== null) {
+        if (exists(SchoolFeeType)) {
             try {
                 // School Fee Type (main section, evIter:32)
                 await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability
@@ -358,7 +362,7 @@ async function KSASchoolSupportProgram(browser, page, body, res, plan, personNum
             }, ClaimType);
         }
 
-        if (SchoolFeeType !== '' || SchoolFeeType !== null) {
+        if (exists(SchoolFeeType)) {
             try {
                 // School Fee Type (main section, evIter:32)
                 await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500))); // small pause for stability

@@ -1,5 +1,10 @@
 const { error } = require("winston");
 const AutomationError = require("../Utils/CustomError");
+const e = require("express");
+
+function exists(value) {
+    return value !== null && value !== undefined && value !== '';
+}
 
 async function KSAOvertimeRequest(browser, page, body, res, plan, personNumber, RequestID, HandleResponse) {
     // Destructure required fields from req.body
@@ -79,13 +84,15 @@ async function KSAOvertimeRequest(browser, page, body, res, plan, personNumber, 
 
         await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
 
-        // Requested Overtime Regular
-        const inputSelector4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:7\\:screenEntryValueNumber\\:\\:content"]';
-        await page.waitForSelector(inputSelector4, { visible: true });
-        await page.click(inputSelector4, { clickCount: 3 }); // Optional: Select all to replace existing value
-        await page.type(inputSelector4, RequestedOvertimeRegular + '');
+        if (exists(RequestedOvertimeRegular)) {
+            // Requested Overtime Regular
+            const inputSelector4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:7\\:screenEntryValueNumber\\:\\:content"]';
+            await page.waitForSelector(inputSelector4, { visible: true });
+            await page.click(inputSelector4, { clickCount: 3 }); // Optional: Select all to replace existing value
+            await page.type(inputSelector4, RequestedOvertimeRegular + '');
+        }
 
-        if (RequestedOvertimeWeekend !== '' || RequestedOvertimeWeekend !== null) {
+        if (exists(RequestedOvertimeWeekend)) {
             // Requested Overtime Weekend
             const inputSelector5 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:8\\:screenEntryValue\\:\\:content"]';
             await page.waitForSelector(inputSelector5, { visible: true });
@@ -93,7 +100,7 @@ async function KSAOvertimeRequest(browser, page, body, res, plan, personNumber, 
             await page.type(inputSelector5, RequestedOvertimeWeekend + '');
         }
 
-        if (RequestedOvertimePublicHolidays !== '' || RequestedOvertimePublicHolidays !== null) {
+        if (exists(RequestedOvertimePublicHolidays)) {
             // Requested Overtime Public Holidays
             const inputSelector6 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:9\\:screenEntryValue\\:\\:content"]';
             await page.waitForSelector(inputSelector6, { visible: true });
@@ -110,12 +117,14 @@ async function KSAOvertimeRequest(browser, page, body, res, plan, personNumber, 
         await page.click(inputSelector7, { clickCount: 3 }); // Optional: selects existing value
         await page.type(inputSelector7, Comments + '');
 
-        // Information
-        const inputSelector8 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:12\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelector8, { visible: true });
-        await page.click(inputSelector8, { clickCount: 3 }); // Optional: select existing value
-        await page.type(inputSelector8, Information + '');
-        await page.keyboard.press('Tab');
+        if (exists(Information)) {
+            // Information
+            const inputSelector8 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:12\\:screenEntryValue\\:\\:content"]';
+            await page.waitForSelector(inputSelector8, { visible: true });
+            await page.click(inputSelector8, { clickCount: 3 }); // Optional: select existing value
+            await page.type(inputSelector8, Information + '');
+            await page.keyboard.press('Tab');
+        }
     } catch (error) {
         console.error('Retrying..|Error filling out form:' + plan);
         // From Date
@@ -136,13 +145,15 @@ async function KSAOvertimeRequest(browser, page, body, res, plan, personNumber, 
 
         await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
 
-        // Requested Overtime Regular
-        const inputSelector4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:7\\:screenEntryValueNumber\\:\\:content"]';
-        await page.waitForSelector(inputSelector4, { visible: true });
-        await page.click(inputSelector4, { clickCount: 3 }); // Optional: Select all to replace existing value
-        await page.type(inputSelector4, RequestedOvertimeRegular + '');
+        if (exists(RequestedOvertimeRegular)) {
+            // Requested Overtime Regular
+            const inputSelector4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:7\\:screenEntryValueNumber\\:\\:content"]';
+            await page.waitForSelector(inputSelector4, { visible: true });
+            await page.click(inputSelector4, { clickCount: 3 }); // Optional: Select all to replace existing value
+            await page.type(inputSelector4, RequestedOvertimeRegular + '');
+        }
 
-        if (RequestedOvertimeWeekend !== '' || RequestedOvertimeWeekend !== null) {
+        if (exists(RequestedOvertimeWeekend)) {
             // Requested Overtime Weekend
             const inputSelector5 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:8\\:screenEntryValue\\:\\:content"]';
             await page.waitForSelector(inputSelector5, { visible: true });
@@ -150,7 +161,7 @@ async function KSAOvertimeRequest(browser, page, body, res, plan, personNumber, 
             await page.type(inputSelector5, RequestedOvertimeWeekend + '');
         }
 
-        if (RequestedOvertimePublicHolidays !== '' || RequestedOvertimePublicHolidays !== null) {
+        if (exists(RequestedOvertimePublicHolidays)) {
             // Requested Overtime Public Holidays
             const inputSelector6 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:9\\:screenEntryValue\\:\\:content"]';
             await page.waitForSelector(inputSelector6, { visible: true });
@@ -167,12 +178,14 @@ async function KSAOvertimeRequest(browser, page, body, res, plan, personNumber, 
         await page.click(inputSelector7, { clickCount: 3 }); // Optional: selects existing value
         await page.type(inputSelector7, Comments + '');
 
-        // Information
-        const inputSelector8 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:12\\:screenEntryValue\\:\\:content"]';
-        await page.waitForSelector(inputSelector8, { visible: true });
-        await page.click(inputSelector8, { clickCount: 3 }); // Optional: select existing value
-        await page.type(inputSelector8, Information + '');
-        await page.keyboard.press('Tab');
+        if (exists(Information)) {
+            // Information
+            const inputSelector8 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:12\\:screenEntryValue\\:\\:content"]';
+            await page.waitForSelector(inputSelector8, { visible: true });
+            await page.click(inputSelector8, { clickCount: 3 }); // Optional: select existing value
+            await page.type(inputSelector8, Information + '');
+            await page.keyboard.press('Tab');
+        }
     }
 
     //Wait for error popup

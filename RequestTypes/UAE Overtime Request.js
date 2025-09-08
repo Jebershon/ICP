@@ -1,6 +1,10 @@
 const { error } = require("winston");
 const AutomationError = require("../Utils/CustomError");
 
+function exists(value) {
+    return value !== null && value !== undefined && value !== '';
+}
+
 async function UAEOvertimeRequest(browser, page, body, plan, res, personNumber, RequestID, HandleResponse) {
     // Destructure required fields from req.body
     const { option, ToDate, Fromdate, RequestedOvertimeRegular, RequestedOvertimeWeekend, RequestedOvertimePublicHolidays, Comments, OvertimeProcessing, ASG_DATE } = body;
@@ -86,7 +90,7 @@ async function UAEOvertimeRequest(browser, page, body, plan, res, personNumber, 
         await page.click(inputSelector4, { clickCount: 3 }); // Optional: Select all to replace existing value
         await page.type(inputSelector4, RequestedOvertimeRegular + '');
 
-        if (RequestedOvertimeWeekend !== '' || RequestedOvertimeWeekend !== null) {
+        if (exists(RequestedOvertimeWeekend)) {
             // Requested Overtime Weekend
             const inputSelector5 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:8\\:screenEntryValue\\:\\:content"]';
             await page.waitForSelector(inputSelector5, { visible: true });
@@ -94,7 +98,7 @@ async function UAEOvertimeRequest(browser, page, body, plan, res, personNumber, 
             await page.type(inputSelector5, RequestedOvertimeWeekend + '');
         }
 
-        if (RequestedOvertimePublicHolidays !== '' || RequestedOvertimePublicHolidays !== null) {
+        if (exists(RequestedOvertimePublicHolidays)) {
             // Requested Overtime Public Holidays
             const inputSelector6 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:9\\:screenEntryValue\\:\\:content"]';
             await page.waitForSelector(inputSelector6, { visible: true });
@@ -143,7 +147,7 @@ async function UAEOvertimeRequest(browser, page, body, plan, res, personNumber, 
         await page.click(inputSelector7, { clickCount: 3 }); // Optional: selects existing value
         await page.type(inputSelector7, Comments + '');
 
-        if (ASG_DATE === '' || ASG_DATE === null) {
+        if (exists(ASG_DATE)) {
             // ASG_Date
             const inputSelectorASGDate = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:13\\:screenEntryValue\\:\\:content"]';
             await page.waitForSelector(inputSelectorASGDate, { visible: true });
@@ -235,7 +239,7 @@ async function UAEOvertimeRequest(browser, page, body, plan, res, personNumber, 
         await page.click(inputSelector7, { clickCount: 3 }); // Optional: selects existing value
         await page.type(inputSelector7, Comments + '');
 
-        if (ASG_DATE === '' || ASG_DATE === null) {
+        if (exists(ASG_DATE)) {
             // ASG_Date
             const inputSelectorASGDate = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:13\\:screenEntryValue\\:\\:content"]';
             await page.waitForSelector(inputSelectorASGDate, { visible: true });
