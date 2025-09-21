@@ -74,13 +74,17 @@ const activeBrowsers = new Set();
 async function automateAction(req, res) {
     const { plan, personNumber, RequestID } = req.body;
     const browser = await puppeteer.launch({
-        headless: false,// Set true if you don't want UI
+        headless: true,// Set true if you don't want UI
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-            '--disable-gpu']
-    }); 
+            '--disable-gpu',
+            '--disable-software-rasterizer',
+            '--disable-extensions',
+            '--no-zygote',
+            '--single-process']
+    });
     activeBrowsers.add(browser);
     let page = await browser.newPage();
     try {
