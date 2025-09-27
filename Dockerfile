@@ -4,6 +4,8 @@ FROM node:22
 RUN apt-get update && apt-get install -y \ 
     wget \
     gnupg \
+    procps \
+    tini \
     ca-certificates \
     fonts-liberation \
     libasound2 \
@@ -52,6 +54,9 @@ RUN npx puppeteer browsers install chrome
 
 # Copy rest of app
 COPY . .
+
+# Set tini as the entrypoint
+ENTRYPOINT ["/usr/bin/tini", "--"]
 
 # Start
 CMD ["node", "index.js"]
