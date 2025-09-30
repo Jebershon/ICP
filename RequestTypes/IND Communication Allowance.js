@@ -1,6 +1,6 @@
 const AutomationError = require('../Utils/CustomError');
 
-async function INDCommunicationAllowance(page, body, res, plan, personNumber, RequestID) {
+async function INDCommunicationAllowance(browser, page, body, res, plan, personNumber, RequestID, HandleResponse) {
     // Destructure required fields from req.body
     const { option, PaymentType } = body;
 

@@ -13,7 +13,6 @@ async function UAECommunicationAllowance(browser, page, body, res, plan, personN
     if (!PaymentType) missingFields.push('PaymentType');
     if (missingFields.length > 0) {
         console.log(plan + ' ' + personNumber + ' ' + RequestID);
-        HandleResponse(plan, personNumber, RequestID, 'Failed', "Missing required field(s): " + missingFields.join(', '));
         throw new AutomationError('Missing required fields: ' + missingFields.join(', '), plan, personNumber, RequestID);
     }
 
