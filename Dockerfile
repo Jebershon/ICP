@@ -49,6 +49,9 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
+# Install app dependencies
+RUN npm install
+
 # Install puppeteer (downloads its matching Chromium)
 RUN npx puppeteer browsers install chrome
 
