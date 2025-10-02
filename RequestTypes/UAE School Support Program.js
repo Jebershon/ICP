@@ -219,7 +219,7 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
         await page.keyboard.press('Tab');
 
         // Delay 
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
 
         try {
             // -------- Child --------
@@ -244,9 +244,6 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
                 }
                 return false; // Not found
             }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
-            if (!childFound) {
-                throw new AutomationError('No child exist with this provided name: ' + Child, plan, personNumber, RequestID);
-            }
         } catch (error) {
             if (error instanceof AutomationError) {
                 throw new AutomationError(error.message, error.plan, error.personNumber, error.RequestID);
@@ -429,7 +426,7 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
         await page.keyboard.press('Tab');
 
         // Delay 
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
 
         try {
             // -------- Child --------
@@ -454,9 +451,6 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
                 }
                 return false; // Not found
             }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
-            if (!childFound) {
-                throw new AutomationError('No child exist with this provided name: ' + Child, plan, personNumber, RequestID);
-            }
         } catch (error) {
             if (error instanceof AutomationError) {
                 throw new AutomationError(error.message, error.plan, error.personNumber, error.RequestID);
