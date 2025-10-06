@@ -322,7 +322,6 @@ async function automateAction(req, res) {
         if (browser) {
             await closeBrowserSafely(browser);
         }
-        cleanupAllBrowsers();
     }
 }
 
