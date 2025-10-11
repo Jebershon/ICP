@@ -91,7 +91,6 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
                     }
                 }
             }, AcademicYear);
-            await page.keyboard.press('Tab');
         } catch (error) {
             console.log("Error occurred while selecting Academic Year (retrying)");
             // Academic Year select dropdown 
@@ -111,7 +110,6 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
                     }
                 }
             }, AcademicYear);
-            await page.keyboard.press('Tab');
         }
 
         try {
@@ -197,29 +195,55 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
         // -------- From Date --------
         const inputSelectorFromDateMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:33\\:screenEntryValueDate\\:\\:content"]';
         await page.waitForSelector(inputSelectorFromDateMain, { visible: true });
-        await page.click(inputSelectorFromDateMain, { clickCount: 3 });
+
+        // Focus the field
+        await page.focus(inputSelectorFromDateMain);
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Clear with keyboard
+        await page.keyboard.down('Control');
+        await page.keyboard.press('A');
+        await page.keyboard.up('Control');
         await page.keyboard.press('Backspace');
-        await page.type(inputSelectorFromDateMain, Fromdate); // e.g. "09/01/2025"
-        await page.keyboard.press('Tab');
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Type with delay between characters
+        await page.type(inputSelectorFromDateMain, Fromdate, { delay: 100 });
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Press Enter instead of Tab
+        await page.keyboard.press('Enter');
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         // -------- To Date --------
         const inputSelectorToDateMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:34\\:screenEntryValueDate\\:\\:content"]';
         await page.waitForSelector(inputSelectorToDateMain, { visible: true });
-        await page.click(inputSelectorToDateMain, { clickCount: 3 });
+
+        // Focus the field
+        await page.focus(inputSelectorToDateMain);
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Clear with keyboard
+        await page.keyboard.down('Control');
+        await page.keyboard.press('A');
+        await page.keyboard.up('Control');
         await page.keyboard.press('Backspace');
-        await page.type(inputSelectorToDateMain, ToDate); // e.g. "09/30/2025"
-        await page.keyboard.press('Tab');
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Type with delay between characters
+        await page.type(inputSelectorToDateMain, ToDate, { delay: 100 });
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Press Enter instead of Tab
+        await page.keyboard.press('Enter');
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         // -------- Paid Amount --------
         const inputSelectorPaidAmountMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:35\\:screenEntryValueNumber\\:\\:content"]';
         await page.waitForSelector(inputSelectorPaidAmountMain, { visible: true });
         await page.click(inputSelectorPaidAmountMain, { clickCount: 3 });
         await page.keyboard.press('Backspace');
-        await page.type(inputSelectorPaidAmountMain, PaidAmount); // e.g. "5000"
-        await page.keyboard.press('Tab');
-
-        // Delay 
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
+        await page.type(inputSelectorPaidAmountMain, PaidAmount); // e.g. "5000"    
 
         try {
             // -------- Child --------
@@ -229,8 +253,9 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
             await page.keyboard.press('Backspace');
             await page.type(inputSelectorChildMain, Child); // e.g. "2"
             await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+
             // Wait for the suggestions to appear
-            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', { visible: true });
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:su0', { visible: true });
             const childFound = await page.evaluate((selector, childName) => {
                 const items = document.querySelectorAll(selector);
                 for (let item of items) {
@@ -243,7 +268,7 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
                     }
                 }
                 return false; // Not found
-            }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:_afrautosuggestpopup li[role="option"]', Child);
+            }, '#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:36\\:ValueSetScreenEntryValue1\\:\\:su0', Child);
         } catch (error) {
             if (error instanceof AutomationError) {
                 throw new AutomationError(error.message, error.plan, error.personNumber, error.RequestID);
@@ -298,7 +323,6 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
                     }
                 }
             }, AcademicYear);
-            await page.keyboard.press('Tab');
         } catch (error) {
             console.log("Error occurred while selecting Academic Year (retrying)");
             // Academic Year select dropdown 
@@ -318,7 +342,6 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
                     }
                 }
             }, AcademicYear);
-            await page.keyboard.press('Tab');
         }
 
         try {
@@ -404,18 +427,48 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
         // -------- From Date --------
         const inputSelectorFromDateMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:33\\:screenEntryValueDate\\:\\:content"]';
         await page.waitForSelector(inputSelectorFromDateMain, { visible: true });
-        await page.click(inputSelectorFromDateMain, { clickCount: 3 });
+
+        // Focus the field
+        await page.focus(inputSelectorFromDateMain);
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Clear with keyboard
+        await page.keyboard.down('Control');
+        await page.keyboard.press('A');
+        await page.keyboard.up('Control');
         await page.keyboard.press('Backspace');
-        await page.type(inputSelectorFromDateMain, Fromdate); // e.g. "09/01/2025"
-        await page.keyboard.press('Tab');
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Type with delay between characters
+        await page.type(inputSelectorFromDateMain, Fromdate, { delay: 100 });
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Press Enter instead of Tab
+        await page.keyboard.press('Enter');
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         // -------- To Date --------
         const inputSelectorToDateMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:34\\:screenEntryValueDate\\:\\:content"]';
         await page.waitForSelector(inputSelectorToDateMain, { visible: true });
-        await page.click(inputSelectorToDateMain, { clickCount: 3 });
+
+        // Focus the field
+        await page.focus(inputSelectorToDateMain);
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Clear with keyboard
+        await page.keyboard.down('Control');
+        await page.keyboard.press('A');
+        await page.keyboard.up('Control');
         await page.keyboard.press('Backspace');
-        await page.type(inputSelectorToDateMain, ToDate); // e.g. "09/30/2025"
-        await page.keyboard.press('Tab');
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Type with delay between characters
+        await page.type(inputSelectorToDateMain, ToDate, { delay: 100 });
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Press Enter instead of Tab
+        await page.keyboard.press('Enter');
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         // -------- Paid Amount --------
         const inputSelectorPaidAmountMain = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:35\\:screenEntryValueNumber\\:\\:content"]';
@@ -423,10 +476,6 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
         await page.click(inputSelectorPaidAmountMain, { clickCount: 3 });
         await page.keyboard.press('Backspace');
         await page.type(inputSelectorPaidAmountMain, PaidAmount); // e.g. "5000"
-        await page.keyboard.press('Tab');
-
-        // Delay 
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
 
         try {
             // -------- Child --------
