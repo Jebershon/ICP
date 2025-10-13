@@ -34,6 +34,8 @@ async function awardCompensation(page,browser,body, res, plan, personNumber, Req
     }
     catch(error){
     // Clicking the Award Compensation Button
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+    
     console.log('No modal found, clicking the button again.');
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:commandToolbarButton1', { visible: true });
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:commandToolbarButton1 a');

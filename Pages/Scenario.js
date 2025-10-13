@@ -34,8 +34,12 @@ async function Scenario(res, body, page, browser, username, password, url,
     //Login to Oracle Fusion
     await Login(page, url, username, password);
 
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+
     // Navigate to Person Management page
     await PersonManagement(page, personNumber);
+
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
 
     // Award Compensation
     await awardCompensation(

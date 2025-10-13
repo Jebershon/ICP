@@ -33,6 +33,8 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
         throw new AutomationError('Missing required fields: ' + missingFields.join(', '), plan, personNumber, RequestID);
     }
 
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
+    
     // Open Plans Dropdown
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:drop');
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:pop', { visible: true });
