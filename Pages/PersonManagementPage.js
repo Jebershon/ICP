@@ -1,10 +1,12 @@
 const navigateToIndividualCompensation = async (page, personNumber) => {
     // Wait for navigation to complete
     await page.waitForNavigation({ waitUntil: 'networkidle2' });
-    
-    try{
+
+    try {
         // Wait for and type person number
         await page.waitForSelector('input[id="_FOpt1:_FOr1:0:_FONSr2:0:MAt1:0:pt1:Perso1:0:SP3:q1:value10::content"]', { visible: true });
+        await page.click('input[id="_FOpt1:_FOr1:0:_FONSr2:0:MAt1:0:pt1:Perso1:0:SP3:q1:value10::content"]', { clickCount: 3 });
+        await page.keyboard.press('Backspace');
         await page.type('input[id="_FOpt1:_FOr1:0:_FONSr2:0:MAt1:0:pt1:Perso1:0:SP3:q1:value10::content"]', personNumber);
 
         // Validation time for the person number field
@@ -27,10 +29,13 @@ const navigateToIndividualCompensation = async (page, personNumber) => {
             page.waitForNavigation({ waitUntil: 'networkidle2' }),
             page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:pt1\\:Perso1\\:0\\:SP3\\:table1\\:am2\\:dc_i1\\:2\\:dci1\\:1\\:dccmi1')
         ]);
-    }catch(error){
+    } catch (error) {
         console.error('Retrying... | navigating to Individual Compensation');
+
         // Wait for and type person number
         await page.waitForSelector('input[id="_FOpt1:_FOr1:0:_FONSr2:0:MAt1:0:pt1:Perso1:0:SP3:q1:value10::content"]', { visible: true });
+        await page.click('input[id="_FOpt1:_FOr1:0:_FONSr2:0:MAt1:0:pt1:Perso1:0:SP3:q1:value10::content"]', { clickCount: 3 });
+        await page.keyboard.press('Backspace');
         await page.type('input[id="_FOpt1:_FOr1:0:_FONSr2:0:MAt1:0:pt1:Perso1:0:SP3:q1:value10::content"]', personNumber);
 
         // Validation time for the person number field

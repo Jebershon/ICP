@@ -92,7 +92,7 @@ async function KSABusinessTripRequest(browser, page, body, res, plan, personNumb
         }
     }, plan);
 
-    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 1000)));
 
     try {
         // Open Options Dropdown
@@ -168,16 +168,24 @@ async function KSABusinessTripRequest(browser, page, body, res, plan, personNumb
         // Start Date1
         const inputSelector1 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:4\\:screenEntryValueDate\\:\\:content"]';
         await page.waitForSelector(inputSelector1, { visible: true });
-        await page.click(inputSelector1, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector1, StartDate1);
+        for (let i = 0; i < 5; i++) {
+            await page.click(inputSelector1, { clickCount: 3 });
+            await page.keyboard.press('Backspace');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            console.log(`Clearing Start Date field: iteration ${i + 1}`);
+        }
+        await page.type(inputSelector1, StartDate1, { delay: 50 });
 
         // End Date1
         const inputSelector2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:5\\:screenEntryValueDate\\:\\:content"]';
         await page.waitForSelector(inputSelector2, { visible: true });
-        await page.click(inputSelector2, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector2, EndDate1);
+        for (let i = 0; i < 5; i++) {
+            await page.click(inputSelector2, { clickCount: 3 });
+            await page.keyboard.press('Backspace');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            console.log(`Clearing End Date field: iteration ${i + 1}`);
+        }
+        await page.type(inputSelector2, EndDate1, { delay: 50 });
 
         // Leaving From1
         const inputSelector3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:6\\:screenEntryValue\\:\\:content"]';
@@ -185,13 +193,14 @@ async function KSABusinessTripRequest(browser, page, body, res, plan, personNumb
         await page.click(inputSelector3, { clickCount: 3 });
         await page.keyboard.press('Backspace');
         await page.type(inputSelector3, LeavingFrom1);
+        await page.keyboard.press('Tab');
 
         //going to1
         const inputSelector4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:7\\:screenEntryValue\\:\\:content"]';
         await page.waitForSelector(inputSelector4, { visible: true });
         await page.click(inputSelector4, { clickCount: 3 });
         await page.keyboard.press('Backspace');
-        await page.type(inputSelector4, Goingto1); // Replace SomeValue with your actual value
+        await page.type(inputSelector4, Goingto1);
         await page.keyboard.press('Tab');
 
         try {
@@ -377,16 +386,24 @@ async function KSABusinessTripRequest(browser, page, body, res, plan, personNumb
         // Start Date1
         const inputSelector1 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:4\\:screenEntryValueDate\\:\\:content"]';
         await page.waitForSelector(inputSelector1, { visible: true });
-        await page.click(inputSelector1, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector1, StartDate1);
+        for (let i = 0; i < 5; i++) {
+            await page.click(inputSelector1, { clickCount: 3 });
+            await page.keyboard.press('Backspace');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            console.log(`Clearing Start Date field: iteration ${i + 1}`);
+        }
+        await page.type(inputSelector1, StartDate1, { delay: 50 });
 
         // End Date1
         const inputSelector2 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:5\\:screenEntryValueDate\\:\\:content"]';
         await page.waitForSelector(inputSelector2, { visible: true });
-        await page.click(inputSelector2, { clickCount: 3 });
-        await page.keyboard.press('Backspace');
-        await page.type(inputSelector2, EndDate1);
+        for (let i = 0; i < 5; i++) {
+            await page.click(inputSelector2, { clickCount: 3 });
+            await page.keyboard.press('Backspace');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            console.log(`Clearing End Date field: iteration ${i + 1}`);
+        }
+        await page.type(inputSelector2, EndDate1, { delay: 50 });
 
         // Leaving From1
         const inputSelector3 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:6\\:screenEntryValue\\:\\:content"]';
@@ -394,6 +411,7 @@ async function KSABusinessTripRequest(browser, page, body, res, plan, personNumb
         await page.click(inputSelector3, { clickCount: 3 });
         await page.keyboard.press('Backspace');
         await page.type(inputSelector3, LeavingFrom1);
+        await page.keyboard.press('Tab');
 
         //going to1
         const inputSelector4 = 'input[id="_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:7\\:screenEntryValue\\:\\:content"]';
