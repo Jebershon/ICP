@@ -6,7 +6,7 @@ async function UAECommunicationAllowance(browser, page, body, res, plan, personN
     const { option, PaymentType, OverrideAmountAbsenceDays } = body;
 
     console.log('validating fields of :' + plan);
-    
+
     // Validate required fields
     const missingFields = [];
     if (!option) missingFields.push('option');
@@ -17,8 +17,9 @@ async function UAECommunicationAllowance(browser, page, body, res, plan, personN
     }
 
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
-    
+
     // Open Plans Dropdown
+    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:drop');
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:drop');
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:pop', { visible: true });
     await page.evaluate((plan) => {
@@ -36,19 +37,38 @@ async function UAECommunicationAllowance(browser, page, body, res, plan, personN
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     try {
-        // Open Options Dropdown
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
-        await page.evaluate((option) => {
-            const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop li');
-            for (let item of items) {
-                if (item.innerText.trim() === option) {
-                    item.scrollIntoView();
-                    item.click();
-                    break;
+        try {
+            // Open Options Dropdown
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
+            await page.evaluate((option) => {
+                const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop li');
+                for (let item of items) {
+                    if (item.innerText.trim() === option) {
+                        item.scrollIntoView();
+                        item.click();
+                        break;
+                    }
                 }
-            }
-        }, option);
+            }, option);
+        } catch (error) {
+            console.log("Retrying..|Selecting Option");
+            // Open Options Dropdown
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
+            await page.evaluate((option) => {
+                const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop li');
+                for (let item of items) {
+                    if (item.innerText.trim() === option) {
+                        item.scrollIntoView();
+                        item.click();
+                        break;
+                    }
+                }
+            }, option);
+        }
     } catch (error) {
         console.error('plan may not available:', error);
         throw new AutomationError('plan may not available', plan, personNumber, RequestID);
@@ -59,7 +79,8 @@ async function UAECommunicationAllowance(browser, page, body, res, plan, personN
 
     try {
         // Open Payment Type Dropdown
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:20\\:lovScreenEntryValue\\:\\:content');
+        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:20\\:lovScreenEntryValue\\:\\:drop');
+        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:20\\:lovScreenEntryValue\\:\\:drop');
         await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:20\\:lovScreenEntryValue\\:\\:pop', { visible: true });
         await page.evaluate((PaymentType) => {
             const options = document.querySelectorAll(
@@ -77,7 +98,8 @@ async function UAECommunicationAllowance(browser, page, body, res, plan, personN
     } catch (error) {
         console.log("Retry payment type selection...");
         // Open Payment Type Dropdown
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:20\\:lovScreenEntryValue\\:\\:content');
+        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:20\\:lovScreenEntryValue\\:\\:drop');
+        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:20\\:lovScreenEntryValue\\:\\:drop');
         await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:r1\\:1\\:evIter\\:20\\:lovScreenEntryValue\\:\\:pop', { visible: true });
         await page.evaluate((PaymentType) => {
             const options = document.querySelectorAll(

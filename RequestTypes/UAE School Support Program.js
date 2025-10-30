@@ -34,8 +34,9 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
     }
 
     await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 3000)));
-    
+
     // Open Plans Dropdown
+    await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:drop');
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:drop');
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc3\\:\\:pop', { visible: true });
     await page.evaluate((plan) => {
@@ -53,19 +54,38 @@ async function UAESchoolSupportProgram(browser, page, body, res, plan, personNum
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     try {
-        // Open Options Dropdown
-        await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
-        await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
-        await page.evaluate((option) => {
-            const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop li');
-            for (let item of items) {
-                if (item.innerText.trim() === option) {
-                    item.scrollIntoView();
-                    item.click();
-                    break;
+        try {
+            // Open Options Dropdown
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
+            await page.evaluate((option) => {
+                const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop li');
+                for (let item of items) {
+                    if (item.innerText.trim() === option) {
+                        item.scrollIntoView();
+                        item.click();
+                        break;
+                    }
                 }
-            }
-        }, option);
+            }, option);
+        } catch (error) {
+            console.log("Retrying..|Selecting Option");
+            // Open Options Dropdown
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
+            await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:drop');
+            await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop', { visible: true });
+            await page.evaluate((option) => {
+                const items = document.querySelectorAll('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:0\\:AP1\\:r2\\:0\\:AT3\\:_ATp\\:soc4\\:\\:pop li');
+                for (let item of items) {
+                    if (item.innerText.trim() === option) {
+                        item.scrollIntoView();
+                        item.click();
+                        break;
+                    }
+                }
+            }, option);
+        }
     } catch (error) {
         console.error('plan may not available:', error);
         throw new AutomationError('plan may not available', plan, personNumber, RequestID);
