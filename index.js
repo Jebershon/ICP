@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const express = require('express');
 const puppeteer = require('puppeteer');
 const bodyParser = require('body-parser');
@@ -405,38 +405,25 @@ app.get("/browser-status", (req, res) => {
 });
 
 app.post('/update-env', (req, res) => {
-    const updates = req.body; // Expecting { ICP_NODE_URL: "...", ICP_GCPUSERNAME: "...", ... }
+    return res.status(200).send(
+    `To update environment variables, follow these steps:
+        To apply the changes:
 
-    if (!updates || typeof updates !== 'object') {
-        return res.status(400).json({ success: false, message: 'Invalid request body' });
-    }
+        1️⃣ Update the .env file located in the 'Files' folder.
 
-    let envContent = '';
-    try {
-        envContent = fs.readFileSync(envFilePath, 'utf-8');
-    } catch (err) {
-        console.error('Error reading .env file:', err);
-        return res.status(500).json({ success: false, message: 'Failed to read .env file' });
-    }
+        2️⃣ Stop the existing container:
+            sudo docker stop icp_PROD
 
-    // Update or add keys
-    for (const [key, value] of Object.entries(updates)) {
-        const regex = new RegExp(`^${key}=.*$`, 'm');
+        3️⃣ Remove the existing container:
+            sudo docker rm icp_PROD
 
-        if (envContent.match(regex)) {
-            envContent = envContent.replace(regex, `${key}=${value}`);
-        } else {
-            envContent += `\n${key}=${value}`;
-        }
-    }
-
-    try {
-        fs.writeFileSync(envFilePath, envContent, 'utf-8');
-        return res.status(200).json({ success: true, message: '.env updated successfully' });
-    } catch (err) {
-        console.error('Error writing .env file:', err);
-        return res.status(500).json({ success: false, message: 'Failed to write .env file' });
-    }
+        4️⃣ Start a new container using the updated .env file:
+            sudo docker run -d --name icp_PROD \\
+                --env-file Files/.env \\
+                -p 3000:3000 \\
+                --restart always \\
+                jebershon/node-automate:v18_PROD_P3000`
+    );
 });
 
 // Endpoint to automate login and perform actions
