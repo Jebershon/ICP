@@ -33,7 +33,9 @@ const app = express();
 app.use(bodyParser.json());
 
 //env variables
-const PORT = process.env.PORT || 3000;
+const PORT = 5000;
+//Port 3000 – UAT & Development
+//Port 5000 – Production
 const url = process.env.ICP_NODE_URL;
 const username = process.env.ICP_GCPUSERNAME;
 const password = process.env.ICP_GCPPASSWORD;
