@@ -5,8 +5,6 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 const fs = require("fs");
 const path = require("path");
-const { execSync } = require("child_process");
-const envFilePath = path.resolve(__dirname, '.env');
 
 // Importing the pages
 const Scenario = require('./Pages/Scenario');
@@ -33,15 +31,15 @@ const app = express();
 app.use(bodyParser.json());
 
 //env variables
-const PORT = 5000;
+const PORT = process.env.PORT;
 //Port 3000 – UAT & Development
 //Port 5000 – Production
+
 const url = process.env.ICP_NODE_URL;
 const username = process.env.ICP_GCPUSERNAME;
 const password = process.env.ICP_GCPPASSWORD;
 const MendixEndpoint = process.env.MENDIX_ENDPOINT;
 const XApiKey = process.env.X_API_KEY;
-const now = new Date();
 
 // Track active browsers with PIDs for better cleanup
 const activeBrowsers = new Map(); // Changed from Set to Map to store PID info

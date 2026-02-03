@@ -113,8 +113,11 @@ async function Scenario(res, body, page, browser, username, password, url,
     await page.waitForSelector('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okConfirmationDialog');
     await page.click('#_FOpt1\\:_FOr1\\:0\\:_FONSr2\\:0\\:MAt1\\:1\\:AP1\\:tt1\\:okConfirmationDialog');
 
-
-    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 2000)));
+    for(let i=0;i<6;i++){
+        //wait for 15 seconds 
+        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 15000)));
+        console.log(`Waiting 15s at iteration ${i+1} for the request to be processed.`);
+    }
 
     // Close the browser
     await browser.close();
