@@ -102,6 +102,7 @@ function countBrowsers() {
 async function launchBrowserSafely() {
     const browser = await puppeteer.launch({
         headless: true,
+        ignoreHTTPSErrors: true,  
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -111,7 +112,10 @@ async function launchBrowserSafely() {
             '--disable-software-rasterizer',
             '--disable-extensions',
             '--no-zygote',
-            '--single-process',
+
+            // ⚠️ Optional – see note below
+            // '--single-process',
+
             '--disable-background-timer-throttling',
             '--disable-backgrounding-occluded-windows',
             '--disable-renderer-backgrounding',
@@ -406,7 +410,7 @@ app.get("/browser-status", (req, res) => {
 
 app.post('/update-env', (req, res) => {
     return res.status(200).send(
-    `To update environment variables, follow these steps:
+        `To update environment variables, follow these steps:
         To apply the changes:
 
         1️⃣ Update the .env file located in the 'Files' folder.
